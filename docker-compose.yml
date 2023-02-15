@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  backend:
+    container_name: backend
+    build: ./backend
+    command: >
+              sh -c '
+              python3 manage.py makemigrations &&
+              python3 manage.py migrate --no-input &&
+              python manage.py runserver 0.0.0.0:8000'
+    volumes:
+      - ./backend/:/usr/src/backend/
+    ports:
+      - 8000:8000
+    env_file:
+      - ./.env.dev
+    networks:
+      - backend_network
+    depends_on:
+      - db
+
+  frontend:
+    container_name: frontend
+    build: ./frontend
+    volumes:
+      - ./frontend/:/frontend/
+      - /frontend/node_modules
+    ports:
+      - "8080:8080"
+    networks:
+      - frontend_network
+    depends_on:
+      - backend
+
+  db:
+    container_name: db
+    image: mysql
+    volumes:
+      - mysql_data:/var/lib/mysql/
+    env_file:
+      - .env.dev.db
+    networks:
+      - frontend_network
+      - backend_network
+
+networks:
+  backend_network:
+    driver: bridge
+  frontend_network:
+    driver: bridge
+volumes:
+  mysql_data:
