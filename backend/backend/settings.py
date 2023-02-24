@@ -27,7 +27,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY", default='django-insecure-!i%gqb%xs0i+v
 DEBUG = int(os.environ.get("DEBUG", default=0))
 
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", default=[]).split(" ")
-
+# ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
@@ -135,7 +135,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://sub.example.com",
     "http://localhost:8080",
     "http://localhost",
-    "http://127.0.0.1:9000",
+    "http://127.0.0.1",
 ]
 
 CORS_ALLOW_METHODS = [

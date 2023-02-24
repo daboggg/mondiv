@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  backend:
+    container_name: backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    command: >
+              sh -c '
+              python3 manage.py makemigrations &&
+              python3 manage.py migrate --no-input &&
+              gunicorn backend.wsgi -b 0.0.0.0:8000'
+    volumes:
+      - ./backend/:/home/app/backend
+    env_file:
+      - ./.env.prod
+    expose:
+      - 8000
+    networks:
+      - backend_network
+      - nginx_network
+    depends_on:
+      - db
+
+  nginx:
+    container_name: nginx
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - backend
+    networks:
+      - nginx_network
+
+  db:
+    container_name: db
+    image: mysql
+    volumes:
+      - mysql_data:/var/lib/mysql/
+    env_file:
+      - .env.prod.db
+    networks:
+      - backend_network
+
+
+networks:
+  backend_network:
+    driver: bridge
+  nginx_network:
+    driver: bridge
+
+volumes:
+  mysql_data:
