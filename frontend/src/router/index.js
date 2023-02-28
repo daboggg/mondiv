@@ -5,6 +5,7 @@ const routes = [
   {
     path: '/',
     name: 'home',
+    meta: {layout: 'main', auth: true},
     component: Home
   },
   // {

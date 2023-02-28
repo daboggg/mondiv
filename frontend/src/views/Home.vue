@@ -14,7 +14,7 @@
 <script>
 
 import ky from "ky";
-
+import Navbar from "@/components/Navbar";
 export default {
   name: 'Home',
   data: () => ({
@@ -26,6 +26,8 @@ export default {
       this.word = await ky(path_suffix + 'api/v1/test/').json()
     }
   },
-  components: {}
+  components: {
+    Navbar
+  }
 }
 </script>

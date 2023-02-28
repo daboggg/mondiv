@@ -1,10 +1,20 @@
 <template>
-  <buttom class="btn">test</buttom>
-  <router-view/>
+  <component :is="layout">
+    <router-view />
+  </component>
 </template>
 <script>
+import MainLayout from "@/layouts/MainLayout";
 export default {
   mounted() {
+  },
+  computed:{
+    layout() {
+      return this.$route.meta.layout + '-layout'
+    }
+  },
+  components:{
+    MainLayout
   }
 }
 </script>
