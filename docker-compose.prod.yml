@@ -8,12 +8,10 @@ services:
       dockerfile: Dockerfile.prod
     command: >
               sh -c '
-              python3 manage.py collectstatic &&
               python3 manage.py makemigrations &&
               python3 manage.py migrate --no-input &&
               gunicorn backend.wsgi -b 0.0.0.0:8000'
-    volumes:
-      - static_volume:/home/app/backend/static
+#    volumes:
 #      - ./backend/:/home/app/backend
     env_file:
       - ./.env.prod
@@ -33,7 +31,6 @@ services:
     ports:
       - 80:80
     volumes:
-      - static_volume:/usr/share/nginx/html
       - ./nginx/conf.d:/etc/nginx/conf.d
     depends_on:
       - backend
@@ -59,4 +56,3 @@ networks:
 
 volumes:
   mysql_data:
-  static_volume:
