@@ -1,5 +1,5 @@
 import { createStore } from 'vuex'
-
+import auth from "@/store/auth";
 export default createStore({
   state: {
   },
@@ -8,7 +8,11 @@ export default createStore({
   mutations: {
   },
   actions: {
+    login({commit},{}){
+
+    }
   },
   modules: {
+    auth
   }
 })
