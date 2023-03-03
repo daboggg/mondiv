@@ -32,7 +32,7 @@ services:
     ports:
       - 80:80
     volumes:
-      - static_volume:/usr/share/nginx/html
+      - static_volume:/usr/share/nginx/html/static
       - ./nginx/conf.d:/etc/nginx/conf.d
     depends_on:
       - backend
