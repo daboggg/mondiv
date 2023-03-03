@@ -12,7 +12,6 @@ RUN apk update \
 
 # create directory for the app user
 RUN mkdir -p /home/app
-RUN mkdir "/home/app/backend/staticfiles"
 
 # create the app user
 RUN addgroup -S app && adduser -S app -G app
