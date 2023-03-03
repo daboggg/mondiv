@@ -8,6 +8,7 @@ services:
       dockerfile: Dockerfile.prod
     command: >
               sh -c '
+              python3 manage.py collectstatic &&
               python3 manage.py makemigrations &&
               python3 manage.py migrate --no-input &&
               gunicorn backend.wsgi -b 0.0.0.0:8000'
