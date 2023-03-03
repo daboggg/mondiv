@@ -20,8 +20,7 @@ RUN addgroup -S app && adduser -S app -G app
 ENV HOME=/home/app
 ENV APP_HOME=/home/app/backend
 RUN mkdir -p $APP_HOME
-RUN mkdir -p $APP_HOME/staticfiles
-RUN mkdir -p $APP_HOME/mediafiles
+
 WORKDIR $APP_HOME
 
 # install dependencies
@@ -42,6 +41,9 @@ RUN chown -R app:app $APP_HOME
 
 # change to the app user
 USER app
+
+RUN mkdir -p $APP_HOME/staticfiles
+RUN mkdir -p $APP_HOME/mediafiles
 
 # run entrypoint.prod.sh
 ENTRYPOINT ["/home/app/backend/entrypoint.prod.sh"]
