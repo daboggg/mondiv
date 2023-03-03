@@ -20,8 +20,8 @@ RUN addgroup -S app && adduser -S app -G app
 ENV HOME=/home/app
 ENV APP_HOME=/home/app/backend
 RUN mkdir -p $APP_HOME
-RUN mkdir -p $APP_HOME/staticfiles
-RUN mkdir -p $APP_HOME/mediafiles
+RUN mkdir -p $APP_HOME/static
+RUN mkdir -p $APP_HOME/media
 WORKDIR $APP_HOME
 
 # install dependencies
