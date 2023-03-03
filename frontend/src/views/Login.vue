@@ -10,15 +10,15 @@
               <div class="row">
                 <div class="input-field col s12">
                   <i class="material-icons prefix">account_circle</i>
-                  <input id="login"
+                  <input id="username"
                          type="text"
                          v-model="username"
                          :class="{
                            invalid: v$.username.$error && v$.username.$dirty,
                            valid: !v$.username.$error && v$.username.$dirty,
                          }"
-                         >
-                  <label for="login">Логин</label>
+                  >
+                  <label for="username">Логин</label>
                   <small v-for="e in v$.username.$errors"
                          :key="e.$uid"
                          class="helper-text invalid">{{ e.$message }}</small>
@@ -34,7 +34,7 @@
                            invalid: v$.password.$error && v$.password.$dirty,
                            valid: !v$.password.$error && v$.password.$dirty,
                          }"
-                         >
+                  >
                   <label for="password">Пароль</label>
                   <small v-for="e in v$.password.$errors"
                          :key="e.$uid"
@@ -88,10 +88,10 @@ export default {
       const isFormCorrect = await this.v$.$validate()
       if (!isFormCorrect) return
       const formData = {
-          username: this.username,
-          password: this.password
-        }
-        console.log(formData)
+        username: this.username,
+        password: this.password
+      }
+      await this.$store.dispatch('login', formData)
     }
   }
 }

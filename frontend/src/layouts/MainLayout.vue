@@ -1,13 +1,16 @@
 <template>
-  <navbar />
-  <router-view />
+  <navbar/>
+  <router-view/>
 </template>
 
 <script>
 import Navbar from "@/components/Navbar";
+import messageMixin from "@/mixins/message.mixin";
+
 export default {
   name: "MainLayout",
-  components:{
+  mixins: [messageMixin],
+  components: {
     Navbar
   }
 }
