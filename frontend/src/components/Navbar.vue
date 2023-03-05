@@ -3,7 +3,7 @@
     <li><a href="#!">one</a></li>
     <li><a href="#!">two</a></li>
     <li class="divider"></li>
-    <li><a href="#!">three</a></li>
+    <li><router-link to="/login?message=you are out">выйти</router-link></li>
   </ul>
   <nav class="teal darken-1">
     <div class="nav-wrapper">

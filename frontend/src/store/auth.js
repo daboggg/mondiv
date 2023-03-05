@@ -1,5 +1,6 @@
 import ky from "ky";
 import errorMessageExtractor from "@/utils/errorMessageExtractor";
+import router from "@/router";
 
 const auth = ky.create({prefixUrl: process.env.VUE_APP_PATH_SUFFIX + 'auth/'})
 
@@ -9,14 +10,20 @@ export default {
     token: null
   },
   getters: {
-
+    token: s => s.token
   },
   mutations: {
     login(state, {token, username}) {
       state.username = username
       state.token = token
-      localStorage.setItem('username', username)
-      localStorage.setItem('token', token)
+      sessionStorage.setItem('username', username)
+      sessionStorage.setItem('token', token)
+    },
+    logout(state) {
+      state.token = null
+      state.username = null
+      sessionStorage.removeItem('token')
+      sessionStorage.removeItem('username')
     }
   },
   actions: {
@@ -26,9 +33,26 @@ export default {
           json: formData
         }).json();
         commit('login', {username: formData.username, token: res.auth_token})
+        router.push('/')
       } catch (error) {
         if (error.name === 'HTTPError') {
           const errors = await error.response.json();
+          commit('setError', errorMessageExtractor(errors))
+        }
+        router.push('/login')
+        throw error
+      }
+    },
+    async logout({commit, getters}) {
+      try {
+        await auth.post('token/logout/',{
+          headers:{Authorization: `Token ${getters.token}`}
+        })
+        commit('logout')
+      } catch (error){
+        if (error.name === 'HTTPError') {
+          const errors = await error.response.json();
+          console.log(errors)
           commit('setError', errorMessageExtractor(errors))
         }
       }

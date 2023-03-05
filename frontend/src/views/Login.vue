@@ -83,6 +83,14 @@ export default {
       }
     }
   },
+  mounted() {
+    if (this.$route.query.message) {
+      if (this.$route.query.message === 'you are out') {
+        this.$store.dispatch('logout')
+        this.$store.commit('setMessage', 'вы вышли из приложения')
+      }
+    }
+  },
   methods: {
     async submitHandler() {
       const isFormCorrect = await this.v$.$validate()
@@ -91,7 +99,10 @@ export default {
         username: this.username,
         password: this.password
       }
-      await this.$store.dispatch('login', formData)
+      try {
+        await this.$store.dispatch('login', formData)
+      }catch (e){
+      }
     }
   }
 }
