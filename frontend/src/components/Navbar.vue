@@ -7,11 +7,11 @@
   </ul>
   <nav class="teal darken-1">
     <div class="nav-wrapper">
-      <a href="#" class="logo">MD</a>
-      <a href="#!" class="brand-logo"><i class="tiny material-icons">desktop_windows</i></a>
+      <router-link to="/" class="logo">MD</router-link>
+      <router-link to="/" class="brand-logo"><i class="tiny material-icons">desktop_windows</i></router-link>
       <ul class="right">
         <li><a href="#">Sass</a></li>
-        <li><a href="#">Components</a></li>
+        <li><router-link to="/dividends">Полученные дивиденды</router-link></li>
         <!-- Dropdown Trigger -->
         <li><a class="dropdown-trigger"
                href="#"
