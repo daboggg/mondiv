@@ -19,16 +19,22 @@ export default {
   actions: {
     async getDividends({commit, getters}) {
       try {
-        const res = await dividend.get('dividends/', {
-          headers: {Authorization: `Token ${getters.token}`}
-        }).json();
+        const res = await dividend('dividends/', {
+          headers: {
+            Authorization: `Token ${getters.token}`
+          }
+        }).json()
         commit('setDividends', res)
-      } catch (error){
-        if (error.name === 'HTTPError') {
-          const errors = await error.response.json();
-          commit('setError', errorMessageExtractor(errors))
+      }catch (error){
+        if (error.message === 'Request failed with status code 401 Unauthorized'){
+          commit('logout')
+          await router.push('/login')
         }
-        throw error
+        if (error.name === 'HTTPError') {
+          const errorJson = await error.response.json();
+          commit('setError', errorMessageExtractor(errorJson))
+          throw error
+        }
       }
     }
   }

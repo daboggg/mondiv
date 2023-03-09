@@ -38,7 +38,11 @@ export default {
   async mounted() {
     try {
       if (!this.$store.getters.dividends.length) {
-        this.$store.dispatch('getDividends')
+        try {
+          await this.$store.dispatch('getDividends')
+        } catch (e){
+          console.log(e)
+        }
       }
       this.dividends = this.$store.getters.dividends;
     } catch (e) {

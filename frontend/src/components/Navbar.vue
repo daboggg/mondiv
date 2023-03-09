@@ -1,24 +1,37 @@
 <template>
-  <ul id="dropdown1" class="dropdown-content">
-    <li><a href="#!">one</a></li>
-    <li><a href="#!">two</a></li>
-    <li class="divider"></li>
-    <li><router-link to="/login?message=you are out">выйти</router-link></li>
-  </ul>
-  <nav class="teal darken-1">
-    <div class="nav-wrapper">
-      <router-link to="/" class="logo">MD</router-link>
-      <router-link to="/" class="brand-logo"><i class="tiny material-icons">desktop_windows</i></router-link>
-      <ul class="right">
-        <li><a href="#">Sass</a></li>
-        <li><router-link to="/dividends">Полученные дивиденды</router-link></li>
-        <!-- Dropdown Trigger -->
-        <li><a class="dropdown-trigger"
-               href="#"
-               ref="dropdown"
-               data-target="dropdown1">Dropdown
-          <i class="material-icons right">arrow_drop_down</i></a></li>
-      </ul>
+  <nav class="navbar navbar-expand-lg bg-body-tertiary" style="background-color: #00796b">
+    <div class="container-fluid">
+      <router-link class="navbar-brand text-white mx-3" to="/">MD</router-link>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+              aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Переключатель навигации">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <router-link class="nav-link active  text-white" aria-current="page" to="/dividends">Полученные дивиденды</router-link>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white" href="#">Ссылка</a>
+          </li>
+        </ul>
+        <ul class="navbar-nav justify-content-end">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown"
+               aria-expanded="false">
+              Выпадающий список
+            </a>
+            <ul class="dropdown-menu  dropdown-menu-end dropdown-menu-dark" style="background-color: #00796b">
+              <li><a class="dropdown-item" href="#">Действие</a></li>
+              <li><a class="dropdown-item" href="#">Другое действие</a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li><router-link class="dropdown-item" to="/login?message=you are out">выйти</router-link></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
     </div>
   </nav>
 </template>
@@ -26,35 +39,8 @@
 <script>
 export default {
   name: "Navbar",
-  data: ()=>({
-    dropdown: null
-  }),
-  mounted() {
-    this.dropdown = M.Dropdown.init(this.$refs.dropdown, {
-      coverTrigger: false
-    })
-  },
-  beforeUnmount() {
-    if (this.dropdown && this.dropdown.destroy) {
-      this.dropdown.destroy()
-    }
-  }
 }
 </script>
 
 <style scoped>
-.logo {
-  font-size: 3em;
-  margin-left: 20px;
-}
-
-.brand-logo i {
-  font-size: 1.2em;
-  margin-left: 5px;
-  margin-top: 3px;
-}
-
-li a {
-  font-size: 18px;
-}
 </style>

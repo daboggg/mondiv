@@ -1,57 +1,43 @@
 <template>
-  <div class="row container">
-    <div class="col s12 m8 xl6 offset-m2 offset-xl3">
-      <div class="card medium teal darken-1">
-        <div class="card-content white-text">
-          <span class="card-title">Вход в MD</span>
-          <div class="divider"></div>
-          <div class="row">
-            <form class="col s12" @submit.prevent="submitHandler">
-              <div class="row">
-                <div class="input-field col s12">
-                  <i class="material-icons prefix">account_circle</i>
-                  <input id="username"
-                         type="text"
-                         v-model="username"
-                         :class="{
-                           invalid: v$.username.$error && v$.username.$dirty,
-                           valid: !v$.username.$error && v$.username.$dirty,
-                         }"
-                  >
-                  <label for="username">Логин</label>
-                  <small v-for="e in v$.username.$errors"
-                         :key="e.$uid"
-                         class="helper-text invalid">{{ e.$message }}</small>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-xs-12 col-md-8 offset-md-2 col-xl-4 offset-xl-4 mt-5">
+        <div class="card text-white mt-5" style="background-color: #00796b">
+          <div class="h5 card-header">Вход в MD</div>
+          <div class="card-body">
+            <form class="mt-3" @submit.prevent="submitHandler">
+              <div class="mb-3">
+                <i class="bi-person-circle me-2"></i>
+                <label for="username" class="form-label">Логин</label>
+                <input type="text" v-model="username" class="form-control" id="username">
+                <div
+                    class="invalid form-text"
+                    v-for="e in v$.username.$errors"
+                    :key="e.$uid"
+                >{{ e.$message }}
                 </div>
               </div>
-              <div class="row">
-                <div class="input-field col s12">
-                  <i class="material-icons prefix">lock_outline</i>
-                  <input id="password"
-                         type="password"
-                         v-model="password"
-                         :class="{
-                           invalid: v$.password.$error && v$.password.$dirty,
-                           valid: !v$.password.$error && v$.password.$dirty,
-                         }"
-                  >
-                  <label for="password">Пароль</label>
-                  <small v-for="e in v$.password.$errors"
-                         :key="e.$uid"
-                         class="helper-text invalid">{{ e.$message }}</small>
+              <div class="mb-3">
+                <i class="bi-lock me-2"></i>
+                <label for="password" class="form-label">Пароль</label>
+                <input type="password" v-model="password" class="form-control" id="password">
+                <div class="invalid form-text"
+                     v-for="e in v$.username.$errors"
+                     :key="e.$uid"
+                >{{ e.$message }}
                 </div>
               </div>
-              <div class="card-action right-align">
-                <button class="btn teal darken-1 waves-effect waves-light" type="submit" name="action">ВОЙТИ
-                  <i class="material-icons right">send</i>
-                </button>
-              </div>
+              <button type="submit"
+                      class="border-3 border border-white mt-3 btn-login btn-outline-light btn btn-teal float-end">
+                <strong>Войти</strong><i class="ms-2 mt-1 bi-play-fill"></i></button>
             </form>
           </div>
         </div>
       </div>
     </div>
   </div>
+
+
 </template>
 
 <script>
@@ -83,11 +69,15 @@ export default {
       }
     }
   },
-  mounted() {
+  async mounted() {
     if (this.$route.query.message) {
       if (this.$route.query.message === 'you are out') {
-        this.$store.dispatch('logout')
-        this.$store.commit('setMessage', 'вы вышли из приложения')
+        try {
+          await this.$store.dispatch('logout')
+          this.$store.commit('setMessage', 'вы вышли из приложения')
+        }catch (e){
+          console.log(e)
+        }
       }
     }
   },
@@ -101,7 +91,11 @@ export default {
       }
       try {
         await this.$store.dispatch('login', formData)
-      }catch (e){
+      } catch (e) {
+        this.username = ''
+        this.password = ''
+        this.v$.$reset()
+        console.log(e)
       }
     }
   }
@@ -109,7 +103,25 @@ export default {
 </script>
 
 <style scoped>
-.divider {
-  margin-bottom: 1rem;
+input {
+  color: #00796b;
+}
+
+input:focus {
+  font-size: 1.2em;
+  font-weight: bolder;
+  color: #00796b;
+}
+
+.invalid {
+  color: yellow;
+  /*color: rgba(167, 9, 9, 0.93);*/
+  font-size: 1em;
+  /*font-weight: bold;*/
+}
+
+button:hover {
+  color: teal;
+  background-color: white;
 }
 </style>

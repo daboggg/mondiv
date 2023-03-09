@@ -1,14 +1,9 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import Home from '../views/Home.vue'
 import store from "@/store";
+import Dividends from "@/views/Dividends";
 
 const routes = [
-  // {
-  //   path: '/test',
-  //   name: 'test',
-  //   meta: {layout: 'main', auth: true},
-  //   component: () => import('../views/Test')
-  // },
   {
     path: '/',
     name: 'home',
@@ -19,7 +14,7 @@ const routes = [
     path: '/dividends',
     name: 'dividends',
     meta: {layout: 'main', auth: true},
-    component: () => import('../views/Dividends')
+    component: Dividends
   },
   {
     path: '/login',
@@ -32,6 +27,10 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
+})
+
+router.afterEach((to,from)=>{
+  document.title = to.name + ' | MD'
 })
 
 router.beforeEach((to, from, next) => {

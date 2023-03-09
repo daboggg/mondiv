@@ -1,5 +1,5 @@
 <template>
-  <div class="grey darken-1 empty-layout valign-wrapper">
+  <div class="bg-secondary empty-layout">
     <router-view />
   </div>
 </template>

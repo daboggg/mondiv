@@ -29,31 +29,31 @@ export default {
   actions: {
     async login({commit}, formData) {
       try {
-        const res = await auth.post('token/login/', {
-          json: formData
-        }).json();
-        commit('login', {username: formData.username, token: res.auth_token})
+        const res = await auth.post('token/login', {json: formData}).json();
+        commit('login',{token:res.auth_token, username:formData.username})
+        commit('setMessage', `Добро пожаловать, ${formData.username}`)
         router.push('/')
       } catch (error) {
         if (error.name === 'HTTPError') {
-          const errors = await error.response.json();
-          commit('setError', errorMessageExtractor(errors))
+          const errorJson = await error.response.json();
+          commit('setError', errorMessageExtractor(errorJson))
+          throw error
         }
-        router.push('/login')
-        throw error
       }
     },
     async logout({commit, getters}) {
       try {
-        await auth.post('token/logout/',{
-          headers:{Authorization: `Token ${getters.token}`}
+        await auth.post('token/logout', {
+          headers: {
+            Authorization: `Token ${getters.token}`
+          }
         })
         commit('logout')
       } catch (error){
         if (error.name === 'HTTPError') {
-          const errors = await error.response.json();
-          console.log(errors)
-          commit('setError', errorMessageExtractor(errors))
+          const errorJson = await error.response.json();
+          commit('setError', errorMessageExtractor(errorJson))
+          throw error
         }
       }
     }
