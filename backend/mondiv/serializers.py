@@ -22,10 +22,12 @@ class AccountSerializer(serializers.ModelSerializer):
 
 
 class DividendSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     company = CompanySerializers()
     currency = CurrencySerializer()
     account = AccountSerializer()
+
     class Meta:
         model = Dividend
         fields = ['id','date_of_receipt', 'company', 'currency',
-                  'payoff', 'date_of_receipt', 'account']
+                  'payoff', 'date_of_receipt', 'account','user']

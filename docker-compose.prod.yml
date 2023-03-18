@@ -13,6 +13,7 @@ services:
               gunicorn backend.wsgi -b 0.0.0.0:8000'
     volumes:
       - static_volume:/home/app/backend/static
+      - media_volume:/home/app/backend/media
 #      - ./backend/:/home/app/backend
     env_file:
       - ./.env.prod
@@ -33,6 +34,7 @@ services:
       - 80:80
     volumes:
       - static_volume:/usr/share/nginx/html/static
+      - media_volume:/usr/share/nginx/html/media
       - ./nginx/conf.d:/etc/nginx/conf.d
     depends_on:
       - backend
@@ -59,3 +61,4 @@ networks:
 volumes:
   mysql_data:
   static_volume:
+  media_volume:

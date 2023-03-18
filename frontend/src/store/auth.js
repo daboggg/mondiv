@@ -48,6 +48,7 @@ export default {
             Authorization: `Token ${getters.token}`
           }
         })
+        commit('removeDividends')
         commit('logout')
       } catch (error){
         if (error.name === 'HTTPError') {

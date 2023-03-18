@@ -22,7 +22,7 @@
                 <label for="password" class="form-label">Пароль</label>
                 <input type="password" v-model="password" class="form-control" id="password">
                 <div class="invalid form-text"
-                     v-for="e in v$.username.$errors"
+                     v-for="e in v$.password.$errors"
                      :key="e.$uid"
                 >{{ e.$message }}
                 </div>
@@ -65,7 +65,7 @@ export default {
         // )
       },
       password: {
-        required: helpers.withMessage('Поле не может быть пустым', required)
+        required: helpers.withMessage('Полe не может быть пустым', required)
       }
     }
   },

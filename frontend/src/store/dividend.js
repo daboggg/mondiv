@@ -14,19 +14,26 @@ export default {
   mutations: {
     setDividends(state, payload) {
       state.dividends = payload
+    },
+    removeDividends(state) {
+      state.dividends = []
     }
   },
   actions: {
-    async getDividends({commit, getters}) {
+    async fetchDividends({commit, getters}, params) {
       try {
         const res = await dividend('dividends/', {
           headers: {
             Authorization: `Token ${getters.token}`
+          },
+          searchParams: {
+            ...params,
+            ...router.currentRoute.value.query
           }
         }).json()
         commit('setDividends', res)
-      }catch (error){
-        if (error.message === 'Request failed with status code 401 Unauthorized'){
+      } catch (error) {
+        if (error.message === 'Request failed with status code 401 Unauthorized') {
           commit('logout')
           await router.push('/login')
         }
