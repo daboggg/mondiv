@@ -3,19 +3,41 @@
 }
 
 img.icon_min {
-  height: 40px;
-  width: 40px;
+    height: 40px;
+    width: 40px;
 }
 
 /*пагинатор*/
 .active > .page-link, .page-link.active {
-  color: var(--bs-pagination-active-color) !important;
-  background-color: #00796b !important;
-  border-color: #00796b !important;
+    color: var(--bs-pagination-active-color) !important;
+    background-color: #00796b !important;
+    border-color: #00796b !important;
 }
+
 .page-link {
-  color: #00796b !important;
+    color: #00796b !important;
 }
+
 .pagination {
-  --bs-pagination-focus-box-shadow: 0 0 0 0 #00796b !important;
+    --bs-pagination-focus-box-shadow: 0 0 0 0 #00796b !important;
+}
+
+/* кнопки выбора количества записец на страницу */
+.btn-check:checked + .btn {
+    background-color: #00796b !important;
+    border-color: #00796b !important;
+    color: white !important;
+}
+
+.btn-group-vertical > .btn, .btn-group > .btn {
+    border-color: #d5d2d2;
+    flex: none !important;
+    color: #00796b;
+    font-weight: bolder;
+}
+
+label.btn.btn-outline-primary:hover {
+    border-color: #00796b;
+    background-color: #d5d2d2;
+    color: #00796b;
 }
