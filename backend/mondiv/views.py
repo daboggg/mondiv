@@ -6,7 +6,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 
 from mondiv.models import Dividend
-from mondiv.permissions import IsOwn
+from mondiv.permissions import IsOwner
 from mondiv.serializers import DividendSerializer
 
 
@@ -33,3 +33,9 @@ class DividendList(generics.ListCreateAPIView):
             date_of_receipt__range=[params.get('start'), params.get('end')],
 
         )
+
+
+class DividendDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Dividend.objects.all()
+    serializer_class = DividendSerializer
+    permission_classes = [IsAuthenticated, IsOwner]

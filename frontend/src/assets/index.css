@@ -40,3 +40,18 @@ label.btn.btn-outline-primary:hover {
     background-color: #d5d2d2;
     color: #00796b;
 }
+
+/*спиннер*/
+.spinner-border {
+    width: 6rem !important;
+    height: 6rem !important;
+    border-left-color: #00796b !important;
+    border-top-color: #00796b !important;
+    border-bottom-color: #00796b !important;
+    border-width: 7px !important;
+}
+
+.btn-teal{
+    background-color: #00796b !important;
+    color: white !important;
+}

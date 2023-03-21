@@ -1,5 +1,33 @@
 <template>
-  <div class="container shadow p-3 my-5 bg-body rounded">
+
+
+  <div v-if="loading" class="text-center mt-5">
+    <div class="spinner-border mt-5" role="status">
+      <span class="visually-hidden">Загрузка...</span>
+    </div>
+  </div>
+
+  <div v-else class="container shadow p-3 my-5 bg-body rounded">
+
+    <!-- Модальное окно -->
+    <div  class="modal fade" id="deleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Подтвердите удаление</h5>
+            <button @click="idForDelete = null" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+          </div>
+          <div class="modal-body">
+            <h3 class="text-danger">Внимание, будьте осторожны, восстановленю не подлежит!</h3>
+          </div>
+          <div class="modal-footer">
+            <button @click="idForDelete = null" type="button" class="btn btn-teal" data-bs-dismiss="modal">Отменить</button>
+            <button @click="deleteDividend" type="button" class="btn btn-danger" data-bs-dismiss="modal">Удалить</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
 
     <div class="col text-center mt-2 display-6">Полученные дивиденды</div>
 
@@ -38,7 +66,7 @@
       </div>
     </div>
 
-    <h5 class="ms-3 my-3">Записей: <span class="badge bg-secondary">{{dividends.count}}</span></h5>
+    <h5 class="ms-3 my-3">Записей: <span class="badge bg-secondary">{{ dividends.count }}</span></h5>
 
     <!--    таблица-->
     <div class="row">
@@ -67,7 +95,9 @@
             <td>{{ localeDate(div.date_of_receipt) }}</td>
             <td>{{ div.account.name }}</td>
             <td><i class="bi-pencil fs-4"></i></td>
-            <td><i class="bi-x-lg fs-4 text-danger"></i></td>
+            <td><router-link to="" @click="idForDelete = div.id" data-bs-toggle="modal" data-bs-target="#deleteModal">
+              <i class="bi-x-lg fs-4 text-danger"></i>
+            </router-link></td>
           </tr>
           </tbody>
         </table>
@@ -112,9 +142,7 @@
         />
       </div>
     </div>
-
   </div>
-
 </template>
 
 <script>
@@ -124,6 +152,8 @@ import {ru} from 'date-fns/locale'
 export default {
   name: "Dividends",
   data: () => ({
+    idForDelete: null,
+    loading: true,
     search: '',
     currentPage: 1,
     pageSize: 10,
@@ -155,15 +185,25 @@ export default {
           start: this.datepicker.start ? this.datepicker.start.toLocaleDateString("en-CA") : '2010-01-01',
           end: this.datepicker.end ? this.datepicker.end.toLocaleDateString("en-CA") : new Date().toLocaleDateString("en-CA")
         })
-        // this.$router.push({query: {page: 26, page_size: 1}})
+        this.loading = false
       } catch (e) {
         console.log(e)
       }
     },
+    async deleteDividend() {
+      try {
+        await this.$store.dispatch('deleteDividend', this.idForDelete);
+        this.fetchDividends()
+      } catch (e){
+        console.log(e)
+      }finally {
+        this.idForDelete = null
+      }
+    },
     localeDate(date) {
-      const options = {year: 'numeric', month: 'long', day: 'numeric'};
-      const dt = new Date(date);
-      return dt.toLocaleDateString("ru-RU", options)
+      return new Date(date).toLocaleDateString("ru-RU", {
+        year: 'numeric', month: 'long', day: 'numeric'
+      })
     },
   },
   components: {

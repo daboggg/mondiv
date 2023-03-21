@@ -10,7 +10,8 @@ export default {
     token: null
   },
   getters: {
-    token: s => s.token
+    token: s => s.token,
+    username: s => s.username
   },
   mutations: {
     login(state, {token, username}) {

@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar navbar-expand-lg bg-body-tertiary" style="background-color: #00796b">
+  <nav class="navbar fixed-top navbar-expand-lg bg-body-tertiary" style="background-color: #00796b">
     <div class="container-fluid">
       <router-link class="navbar-brand text-white mx-3" to="/">MD</router-link>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
@@ -7,7 +7,9 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+<!--        ссылки для зарегистрированного пользователя-->
+        <ul v-if="$store.getters.username" class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
             <router-link class="nav-link active  text-white" aria-current="page" to="/dividends">Полученные дивиденды</router-link>
           </li>
@@ -15,11 +17,11 @@
             <a class="nav-link text-white" href="#">Ссылка</a>
           </li>
         </ul>
-        <ul class="navbar-nav justify-content-end">
+        <ul v-if="$store.getters.username" class="navbar-nav justify-content-end">
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown"
                aria-expanded="false">
-              Выпадающий список
+              {{ $store.getters.username }}
             </a>
             <ul class="dropdown-menu  dropdown-menu-end dropdown-menu-dark" style="background-color: #00796b">
               <li><a class="dropdown-item" href="#">Действие</a></li>
@@ -31,6 +33,19 @@
             </ul>
           </li>
         </ul>
+
+<!--        ссылки для незарегистрированного пользователя-->
+        <div v-if="!$store.getters.username" class="navbar-nav me-auto mb-2 mb-lg-0"></div>
+        <ul v-if="!$store.getters.username" class="navbar-nav justify-content-end align-items-center">
+          <li class="nav-item">
+            <router-link class="nav-link text-white" aria-current="page" to="#">Регистрация</router-link>
+          </li>
+          <span class="nav-item text-white">|</span>
+          <li class="nav-item">
+            <router-link class="nav-link text-white" to="/login">Вход</router-link>
+          </li>
+        </ul>
+
       </div>
     </div>
   </nav>

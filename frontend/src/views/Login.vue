@@ -115,9 +115,7 @@ input:focus {
 
 .invalid {
   color: yellow;
-  /*color: rgba(167, 9, 9, 0.93);*/
   font-size: 1em;
-  /*font-weight: bold;*/
 }
 
 button:hover {

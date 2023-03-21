@@ -43,6 +43,26 @@ export default {
           throw error
         }
       }
+    },
+    async deleteDividend({commit, getters}, id) {
+      try {
+        await dividend.delete(`dividends/${id}/`, {
+          headers: {
+            Authorization: `Token ${getters.token}`
+          }
+        })
+        commit('setMessage', 'успешно удалено')
+      } catch (error) {
+        if (error.message === 'Request failed with status code 401 Unauthorized') {
+          commit('logout')
+          await router.push('/login')
+        }
+        if (error.name === 'HTTPError') {
+          const errorJson = await error.response.json();
+          commit('setError', errorMessageExtractor(errorJson))
+          throw error
+        }
+      }
     }
   }
 }
