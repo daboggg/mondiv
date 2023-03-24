@@ -34,7 +34,7 @@ class DividendList(generics.ListCreateAPIView):
             user=self.request.user,
             date_of_receipt__range=[params.get('start'), params.get('end')],
 
-        )
+        ).order_by('id')
 
     def post(self, request, *args, **kwargs):
         serializer = DividendSerializer(data=request.data)
