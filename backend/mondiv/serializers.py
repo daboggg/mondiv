@@ -3,31 +3,50 @@ from rest_framework import serializers
 from mondiv.models import Dividend, Company, Currency, Account
 
 
-class CompanySerializers(serializers.ModelSerializer):
+############ Company ###################################
+class CompanyListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Company
-        fields = ['name', 'icon_image', 'ticker']
+        fields = ['id','name', 'icon_image', 'ticker']
 
 
+############ Currency ###################################
 class CurrencySerializer(serializers.ModelSerializer):
     class Meta:
         model = Currency
-        fields = ['name']
+        fields = ['id','name']
 
 
+############ Account ###################################
 class AccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
-        fields = ['name']
+        fields = ['id','name']
 
 
-class DividendSerializer(serializers.ModelSerializer):
+############ Dividen ###################################
+class DividendListSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    company = CompanySerializers()
-    currency = CurrencySerializer()
-    account = AccountSerializer()
+    # company = CompanySerializer()
+    # company = serializers.PrimaryKeyRelatedField(read_only=True)
+    # currency = CurrencySerializer()
+    # account = AccountSerializer()
 
     class Meta:
         model = Dividend
-        fields = ['id','date_of_receipt', 'company', 'currency',
-                  'payoff', 'date_of_receipt', 'account','user']
+        fields = '__all__'
+        # fields = ['id','date_of_receipt', 'company', 'currency',
+        #           'payoff', 'date_of_receipt', 'account','user']
+        depth = 1
+
+
+class DividendSerializer(serializers.ModelSerializer):
+    # user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    user = serializers.ReadOnlyField(source='author.username')
+
+    def create(self, validated_data):
+        return Dividend.objects.create(**validated_data)
+
+    class Meta:
+        model = Dividend
+        fields = '__all__'

@@ -1,7 +1,7 @@
 <template>
-  <nav class="navbar fixed-top navbar-expand-lg bg-body-tertiary" style="background-color: #00796b">
+  <nav class="navbar navbar-dark sticky-top navbar-expand-lg bg-body-tertiary" style="background-color: #00796b">
     <div class="container-fluid">
-      <router-link class="navbar-brand text-white mx-3" to="/">MD</router-link>
+      <router-link class="navbar-brand mx-3" to="/">MD</router-link>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
               aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Переключатель навигации">
         <span class="navbar-toggler-icon"></span>
@@ -11,10 +11,10 @@
 <!--        ссылки для зарегистрированного пользователя-->
         <ul v-if="$store.getters.username" class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <router-link class="nav-link active  text-white" aria-current="page" to="/dividends">Полученные дивиденды</router-link>
+            <router-link class="nav-link" aria-current="page" to="/dividends">Полученные дивиденды</router-link>
           </li>
           <li class="nav-item">
-            <a class="nav-link text-white" href="#">Ссылка</a>
+            <router-link class="nav-link" to="/add_dividend">Добавить дивиденд</router-link>
           </li>
         </ul>
         <ul v-if="$store.getters.username" class="navbar-nav justify-content-end">

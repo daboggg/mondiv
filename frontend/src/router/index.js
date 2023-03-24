@@ -1,5 +1,4 @@
 import {createRouter, createWebHistory} from 'vue-router'
-import Home from '../views/Home.vue'
 import store from "@/store";
 import Dividends from "@/views/Dividends";
 
@@ -17,6 +16,19 @@ const routes = [
     component: Dividends
   },
   {
+    path: '/edit_dividend/:id',
+    name: 'edit_dividend',
+    meta: {layout: 'main', auth: true},
+    props: true,
+    component: () => import('../views/AddOrEditDividend')
+  },
+  {
+    path: '/add_dividend',
+    name: 'add_dividend',
+    meta: {layout: 'main', auth: true},
+    component: () => import('../views/AddOrEditDividend')
+  },
+  {
     path: '/login',
     name: 'login',
     meta: {layout: 'empty'},
@@ -26,10 +38,11 @@ const routes = [
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
-  routes
+  routes,
+  linkExactActiveClass: "active"
 })
 
-router.afterEach((to,from)=>{
+router.afterEach((to, from) => {
   document.title = to.name + ' | MD'
 })
 

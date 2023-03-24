@@ -3,7 +3,7 @@
     <div class="row">
       <div class="col-xs-12 col-md-8 offset-md-2 col-xl-4 offset-xl-4 mt-5">
         <div class="card text-white mt-5" style="background-color: #00796b">
-          <div class="h5 card-header">Вход в MD</div>
+          <div class="h5 card-header"><i class="bi-box-arrow-in-right fs-5 me-2"></i>Вход в MD</div>
           <div class="card-body">
             <form class="mt-3" @submit.prevent="submitHandler">
               <div class="mb-3">
@@ -28,7 +28,7 @@
                 </div>
               </div>
               <button type="submit"
-                      class="border-3 border border-white mt-3 btn-login btn-outline-light btn btn-teal float-end">
+                      class="border-3 border border-white mt-3 btn-login btn-outline-light btn float-end">
                 <strong>Войти</strong><i class="ms-2 mt-1 bi-play-fill"></i></button>
             </form>
           </div>

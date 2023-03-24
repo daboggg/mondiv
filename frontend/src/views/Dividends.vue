@@ -1,28 +1,32 @@
 <template>
 
-
+  <!--  спиннер-->
   <div v-if="loading" class="text-center mt-5">
     <div class="spinner-border mt-5" role="status">
       <span class="visually-hidden">Загрузка...</span>
     </div>
   </div>
 
-  <div v-else class="container shadow p-3 my-5 bg-body rounded">
+  <div v-else class="container p-3 my-3 bg-body">
 
     <!-- Модальное окно -->
-    <div  class="modal fade" id="deleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal fade" id="deleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+         aria-labelledby="staticBackdropLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">Подтвердите удаление</h5>
-            <button @click="idForDelete = null" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            <button @click="idForDelete = null" type="button" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="Закрыть"></button>
           </div>
           <div class="modal-body">
             <h3 class="text-danger">Внимание, будьте осторожны, восстановленю не подлежит!</h3>
           </div>
           <div class="modal-footer">
-            <button @click="idForDelete = null" type="button" class="btn btn-teal" data-bs-dismiss="modal">Отменить</button>
-            <button @click="deleteDividend" type="button" class="btn btn-danger" data-bs-dismiss="modal">Удалить</button>
+            <button @click="idForDelete = null" type="button" class="btn btn-teal" data-bs-dismiss="modal">Отменить
+            </button>
+            <button @click="deleteDividend" type="button" class="btn btn-danger" data-bs-dismiss="modal">Удалить
+            </button>
           </div>
         </div>
       </div>
@@ -91,13 +95,18 @@
             <td>{{ div.company.ticker }}</td>
             <td>{{ div.company.name }}</td>
             <td>{{ div.currency.name }}</td>
-            <td>{{ div.payoff }}</td>
+            <td>{{ parseFloat(div.payoff).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1 ").replace('.', ',') }}</td>
             <td>{{ localeDate(div.date_of_receipt) }}</td>
             <td>{{ div.account.name }}</td>
-            <td><i class="bi-pencil fs-4"></i></td>
-            <td><router-link to="" @click="idForDelete = div.id" data-bs-toggle="modal" data-bs-target="#deleteModal">
-              <i class="bi-x-lg fs-4 text-danger"></i>
-            </router-link></td>
+            <td>
+              <router-link :to="{ name: 'edit_dividend', params: { id: div.id }, query:{r_page:this.currentPage}}"><i
+                  class="text-black bi-pencil fs-4"></i></router-link>
+            </td>
+            <td>
+              <router-link to="" @click="idForDelete = div.id" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                <i class="bi-x-lg fs-4 text-danger"></i>
+              </router-link>
+            </td>
           </tr>
           </tbody>
         </table>
@@ -167,7 +176,11 @@ export default {
     }
   }),
   async mounted() {
+    if (this.$route.query.r_page) {
+      this.currentPage = this.$route.query.r_page
+    }
     await this.fetchDividends()
+
   },
   computed: {
     dividends() {
@@ -194,9 +207,9 @@ export default {
       try {
         await this.$store.dispatch('deleteDividend', this.idForDelete);
         this.fetchDividends()
-      } catch (e){
+      } catch (e) {
         console.log(e)
-      }finally {
+      } finally {
         this.idForDelete = null
       }
     },

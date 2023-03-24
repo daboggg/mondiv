@@ -49,6 +49,7 @@ export default {
             Authorization: `Token ${getters.token}`
           }
         })
+        commit('removeAccounts')
         commit('removeDividends')
         commit('logout')
       } catch (error){

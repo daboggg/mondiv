@@ -35,8 +35,12 @@ class CompanyAdmin(admin.ModelAdmin):
 
     get_html_photo.short_description = 'логотип'
 
+
+class AccountAdmin(admin.ModelAdmin):
+    list_display = ('id','name', 'user')
+
 admin.site.register(Company, CompanyAdmin)
-admin.site.register(Account)
+admin.site.register(Account, AccountAdmin)
 admin.site.register(Currency)
 admin.site.register(Dividend, DividendAdmin)
 admin.site.register(Report, ReportAdmin)
