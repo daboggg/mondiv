@@ -109,7 +109,8 @@ class CompanyList(generics.ListCreateAPIView):
                 company.get_remote_image()
                 return Response({'info': {'message': "Компания добалена"}})
             except Exception as e:
-                return Response({'info': json.loads(e.args[0])})
+                # return Response({'info': json.loads(e.args[0])})
+                raise e
 
 
 class CompanyListWithPagination(generics.ListCreateAPIView):
