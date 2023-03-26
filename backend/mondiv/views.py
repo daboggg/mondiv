@@ -110,6 +110,7 @@ class CompanyList(generics.ListCreateAPIView):
                 return Response({'info': {'message': "Компания добалена"}})
             except Exception as e:
                 # return Response({'info': json.loads(e.args[0])})
+                print(e)
                 raise e
 
 
