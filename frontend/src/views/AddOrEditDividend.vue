@@ -105,17 +105,10 @@
                 </div>
               </div>
 
-
-<!--              <button @click=""-->
-<!--                      class="border-3 border border-white mt-3 btn-login btn-outline-light btn float-start">-->
-<!--                <strong>Отмена</strong><i class="ms-2 mt-1 fw-bold bi-x"></i></button>-->
-
               <button type="submit"
                       class="border-3 border border-white mt-3 btn-login btn-outline-light btn float-end">
                 <strong>{{id?'Изменить':'Добавить'}}</strong><i class="ms-2 mt-1 bi-play-fill"></i></button>
             </form>
-<!--            {{editableDividend}}-->
-<!--            {{editableDividend.company}}-->
           </div>
         </div>
       </div>
@@ -207,7 +200,6 @@ export default {
         currency: this.currency,
         account: this.account
       }
-      console.log(formData)
       try {
         if (this.id) {
           await this.$store.dispatch('editDividend', {formData, id:this.editableDividend.id});

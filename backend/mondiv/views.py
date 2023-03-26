@@ -1,3 +1,4 @@
+import json
 from django.http import JsonResponse
 from django.db.models import Q
 from django.shortcuts import render
@@ -10,10 +11,12 @@ from mondiv.models import Dividend, Currency, Account, Company
 from mondiv.permissions import IsOwner
 from mondiv.serializers import DividendListSerializer, CurrencySerializer, AccountSerializer, DividendSerializer, \
     CompanyListSerializer
+from mondiv.utils import client
 
 
 def test(request):
     return JsonResponse({'test': "tset"})
+
 
 ######### Dividend ###############################
 class DividendListPagination(PageNumberPagination):
@@ -30,7 +33,8 @@ class DividendList(generics.ListCreateAPIView):
     def get_queryset(self):
         params = self.request.query_params
         return Dividend.objects.filter(
-            Q(company__name__icontains=params.get('search')) | Q(company__ticker__icontains=params.get('search')) | Q(account__name__icontains=params.get('search')),
+            Q(company__name__icontains=params.get('search')) | Q(company__ticker__icontains=params.get('search')) | Q(
+                account__name__icontains=params.get('search')),
             user=self.request.user,
             date_of_receipt__range=[params.get('start'), params.get('end')],
 
@@ -72,9 +76,44 @@ class AccountList(mixins.ListModelMixin, generics.GenericAPIView):
 
 
 ######### Company ###############################
-class CompanyList(mixins.ListModelMixin, generics.GenericAPIView):
+# class CompanyList(mixins.ListModelMixin, generics.GenericAPIView):
+#     queryset = Company.objects.all()
+#     serializer_class = CompanyListSerializer
+#
+#     def get(self, request, *args, **kwargs):
+#         return self.list(request, *args, **kwargs)
+
+
+class CompanyListPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 1000
+
+
+class CompanyList(generics.ListCreateAPIView):
     queryset = Company.objects.all()
     serializer_class = CompanyListSerializer
 
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
+    def post(self, request, *args, **kwargs):
+        ticker = request.data['ticker'].upper()
+        if Company.objects.filter(ticker=ticker).exists():
+            return Response({'info': {'message': "Компания с таким тикером уже добавлена"}})
+        else:
+            try:
+                res = client.get_ticker_details(ticker)
+                company = Company()
+                company.name = res.name
+                company.ticker = res.ticker
+                company.description = res.description
+                company.icon_url = res.branding.icon_url
+                company.get_remote_image()
+                return Response({'info': {'message': "Компания добалена"}})
+            except Exception as e:
+                return Response({'info': json.loads(e.args[0])})
+
+
+class CompanyListWithPagination(generics.ListCreateAPIView):
+    queryset = Company.objects.all()
+    serializer_class = CompanyListSerializer
+    pagination_class = CompanyListPagination
+

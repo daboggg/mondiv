@@ -5,6 +5,7 @@ from urllib import request
 import os
 
 # from mondiv.utils import get_upl_and_apiKey
+from mondiv.utils import get_upl_and_apiKey
 
 
 class Currency(models.Model):
@@ -46,17 +47,17 @@ class Company(models.Model):
     #     # Потом удаляем сам файл
     #     storage.delete(path)
 
-    # def get_remote_image(self):
-    #     if self.icon_url and not self.icon_image:
-    #         url = get_upl_and_apiKey(self.icon_url)
-    #         result = request.urlretrieve(url)
-    #         u = os.path.basename(url)
-    #         self.icon_image.save(
-    #             # выделяем из url имя сохраняемого файла
-    #             self.ticker + '.' + u[u.rindex(".") + 1:u.rindex("?")],
-    #             File(open(result[0], 'rb'))
-    #         )
-    #     self.save()
+    def get_remote_image(self):
+        if self.icon_url and not self.icon_image:
+            url = get_upl_and_apiKey(self.icon_url)
+            result = request.urlretrieve(url)
+            u = os.path.basename(url)
+            self.icon_image.save(
+                # выделяем из url имя сохраняемого файла
+                self.ticker + '.' + u[u.rindex(".") + 1:u.rindex("?")],
+                File(open(result[0], 'rb'))
+            )
+        self.save()
 
     def __str__(self):
         return self.name

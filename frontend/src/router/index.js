@@ -29,6 +29,12 @@ const routes = [
     component: () => import('../views/AddOrEditDividend')
   },
   {
+    path: '/add_company',
+    name: 'add_company',
+    meta: {layout: 'main', auth: true},
+    component: () => import('../views/AddCompany')
+  },
+  {
     path: '/login',
     name: 'login',
     meta: {layout: 'empty'},

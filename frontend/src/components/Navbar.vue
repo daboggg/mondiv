@@ -11,10 +11,13 @@
 <!--        ссылки для зарегистрированного пользователя-->
         <ul v-if="$store.getters.username" class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <router-link class="nav-link" aria-current="page" to="/dividends">Полученные дивиденды</router-link>
+            <router-link class="nav-link" to="/add_company">Добавить компанию</router-link>
           </li>
           <li class="nav-item">
             <router-link class="nav-link" to="/add_dividend">Добавить дивиденд</router-link>
+          </li>
+          <li class="nav-item">
+            <router-link class="nav-link" aria-current="page" to="/dividends">Полученные дивиденды</router-link>
           </li>
         </ul>
         <ul v-if="$store.getters.username" class="navbar-nav justify-content-end">

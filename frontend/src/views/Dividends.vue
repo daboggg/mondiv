@@ -70,6 +70,7 @@
       </div>
     </div>
 
+<!--    счетчик записей-->
     <h5 class="ms-3 my-3">Записей: <span class="badge bg-secondary">{{ dividends.count }}</span></h5>
 
     <!--    таблица-->
@@ -90,7 +91,7 @@
           </thead>
           <tbody>
           <tr v-for="(div, index) in dividends.results" :key="div.id">
-            <th>{{ index + 1 }}</th>
+            <th>{{ (index + 1)+(currentPage-1)*pageSize }}</th>
             <td><img class="icon_min img-thumbnail" :src="div.company.icon_image" alt=""></td>
             <td>{{ div.company.ticker }}</td>
             <td>{{ div.company.name }}</td>

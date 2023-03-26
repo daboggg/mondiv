@@ -8,5 +8,6 @@ urlpatterns = [
     path('dividends/', DividendList.as_view()),
     path('currencies/', CurrencyList.as_view()),
     path('accounts/', AccountList.as_view()),
+    path('companies_with_pagination/', CompanyListWithPagination.as_view()),
     path('companies/', CompanyList.as_view()),
 ]
