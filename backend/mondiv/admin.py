@@ -5,7 +5,7 @@ from mondiv.models import Company, Account, Currency, Dividend, Report
 
 
 class ReportAdmin(admin.ModelAdmin):
-    list_display = ('id',
+    list_display = ('id', 'user',
         'account','currency',
         'report_date'
         ,'amount')

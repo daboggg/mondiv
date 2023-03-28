@@ -3,6 +3,7 @@ import auth from "@/store/auth";
 import dividend from "@/store/dividend";
 import account from "@/store/account";
 import company from "@/store/company";
+import report from "@/store/report";
 import router from "@/router";
 import errorMessageExtractor from "@/utils/errorMessageExtractor";
 
@@ -57,6 +58,6 @@ export default createStore({
     }
   },
   modules: {
-    auth, dividend, account, company
+    auth, dividend, account, company, report
   }
 })

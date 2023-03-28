@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from mondiv.models import Dividend, Company, Currency, Account
+from mondiv.models import Dividend, Company, Currency, Account, Report
 
 
 ############ Company ###################################
@@ -24,7 +24,7 @@ class AccountSerializer(serializers.ModelSerializer):
         fields = ['id','name']
 
 
-############ Dividen ###################################
+############ Dividend ###################################
 class DividendListSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     # company = CompanySerializer()
@@ -42,7 +42,7 @@ class DividendListSerializer(serializers.ModelSerializer):
 
 class DividendSerializer(serializers.ModelSerializer):
     # user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    user = serializers.ReadOnlyField(source='author.username')
+    user = serializers.ReadOnlyField(source='user.username')
 
     def create(self, validated_data):
         return Dividend.objects.create(**validated_data)
@@ -50,3 +50,13 @@ class DividendSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dividend
         fields = '__all__'
+
+
+############ Report ###################################
+class ReportListSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
+    class Meta:
+        model = Report
+        fields = '__all__'
+        depth = 1

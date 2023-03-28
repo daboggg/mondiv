@@ -35,6 +35,12 @@ const routes = [
     component: () => import('../views/AddCompany')
   },
   {
+    path: '/reports',
+    name: 'reports',
+    meta: {layout: 'main', auth: true},
+    component: () => import('../views/Reports')
+  },
+  {
     path: '/login',
     name: 'login',
     meta: {layout: 'empty'},

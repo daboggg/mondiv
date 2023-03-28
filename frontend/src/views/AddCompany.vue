@@ -2,10 +2,12 @@
 
   <div class="container p-3 my-3 bg-body">
 
+    <div class="col text-center mt-2 display-6">Добавить компанию</div>
+
     <!--фарма добавления тикера-->
-    <div class="row mb-5">
+    <div class="row">
       <div class="col-xs-12 col-md-8 offset-md-2 col-xl-4 offset-xl-4 mt-5">
-        <form class="input-group justify-content-center my-4" @submit.prevent="submitHandler">
+        <form class="input-group justify-content-center mb-2" @submit.prevent="submitHandler">
           <span class="input-group-text">Тикер</span>
           <input v-model="ticker" class="form-control"/>
           <button type="button" @click="ticker = ''" class="btn btn-light ms-1"><i
@@ -14,6 +16,24 @@
             <span v-if="adding" class="adding spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
             {{ adding ? 'Добавление...' : 'Добавить' }}
           </button>
+          <div
+              class="invalid form-text me-5"
+              v-for="e in v$.ticker.$errors"
+              :key="e.$uid"
+          >{{ e.$message }}
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!--фарма поиска-->
+    <div class="row mb-2">
+      <div class="col-xs-12 col-md-8 offset-md-2 col-xl-4 offset-xl-4">
+        <form class="input-group justify-content-end my-4" @submit.prevent="fetchCompaniesWithPagination">
+          <span class="input-group-text">Поиск</span>
+          <input @input="currentPage = 1; fetchCompaniesWithPagination()" v-model="search" class="form-control"/>
+          <button type="button" @click="search = ''" class="btn btn-light ms-1"><i
+              class="bi-x-lg text-danger"></i></button>
           <div
               class="invalid form-text me-5"
               v-for="e in v$.ticker.$errors"

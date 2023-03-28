@@ -7,10 +7,10 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from mondiv.models import Dividend, Currency, Account, Company
+from mondiv.models import Dividend, Currency, Account, Company, Report
 from mondiv.permissions import IsOwner
 from mondiv.serializers import DividendListSerializer, CurrencySerializer, AccountSerializer, DividendSerializer, \
-    CompanyListSerializer
+    CompanyListSerializer, ReportListSerializer
 from mondiv.utils import client
 
 
@@ -113,7 +113,32 @@ class CompanyList(generics.ListCreateAPIView):
 
 
 class CompanyListWithPagination(generics.ListCreateAPIView):
-    queryset = Company.objects.all()
     serializer_class = CompanyListSerializer
     pagination_class = CompanyListPagination
 
+    def get_queryset(self):
+        params = self.request.query_params
+        return Company.objects.filter(
+            Q(name__icontains=params.get('search'))
+            | Q(ticker__icontains=params.get('search'))
+        ).order_by('id')
+
+
+######### Company ###############################
+class ReportListPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 1000
+
+
+class ReportList(generics.ListCreateAPIView):
+    serializer_class = ReportListSerializer
+    pagination_class = ReportListPagination
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        params = self.request.query_params
+        return Report.objects.filter(
+            user=self.request.user,
+            report_date__range=[params.get('start'), params.get('end')],
+        ).order_by('id')
