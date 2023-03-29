@@ -37,27 +37,31 @@
 
     <!--    выбор по дате-->
     <div class="row">
-      <form class="input-group justify-content-center my-4" @submit.prevent="currentPage = 1; fetchDividends()">
+      <div class="col-md-12 col-xl-8 offset-xl-2">
+        <form class=" input-group justify-content-center my-4" @submit.prevent="currentPage = 1; fetchDividends()">
+
         <span class="input-group-text">С</span>
-        <datepicker v-model="datepicker.start"
-                    :inputFormat="datepicker.inputFormat"
-                    :locale="datepicker.ru"
-                    :upperLimit="datepicker.upperLimit"
-                    class="form-control"
+        <input v-model="qParams.date_start" type="date"
+               class="form-control" min="2019-01-01"
+               :max="new Date().toLocaleDateString('en-CA')"
+               style="font-weight: bold"
         />
-        <button type="button" @click="datepicker.start = null" class="btn btn-light ms-1"><i
+        <button type="button" @click="qParams.date_start = ''; fetchDividends()" class="input-group-btn btn btn-light ms-1"><i
             class="bi-x-lg text-danger"></i></button>
+
         <span class="input-group-text ms-3">По</span>
-        <datepicker v-model="datepicker.end"
-                    :inputFormat="datepicker.inputFormat"
-                    :locale="datepicker.ru"
-                    :upperLimit="datepicker.upperLimit"
-                    class="form-control"
+        <input v-model="qParams.date_end" type="date"
+               class="form-control" min="2019-01-01"
+               :max="new Date().toLocaleDateString('en-CA')"
+               style="font-weight: bold"
+
         />
-        <button type="button" @click="datepicker.end = null" class="btn btn-light ms-1"><i
+        <button type="button" @click="qParams.date_end = ''; fetchDividends()" class="input-group-btn btn btn-light ms-1"><i
             class="bi-x-lg text-danger"></i></button>
+
         <button class="btn btn-light ms-3 btn-outline-dark" type="submit">Выбрать</button>
       </form>
+      </div>
     </div>
 
     <!--      поиск -->
@@ -65,12 +69,14 @@
       <div class="col-6">
         <div class="input-group">
           <span class="input-group-text">Поиск</span>
-          <input @input="currentPage = 1; fetchDividends()" v-model="search" type="text" class="form-control">
+          <input @input="qParams.page = 1; fetchDividends()" v-model="qParams.search" type="text" class="form-control">
+          <button type="button" @click="qParams.search = ''; fetchDividends()" class="input-group-btn btn btn-light ms-1"><i
+            class="bi-x-lg text-danger"></i></button>
         </div>
       </div>
     </div>
 
-<!--    счетчик записей-->
+    <!--    счетчик записей-->
     <h5 class="ms-3 my-3">Записей: <span class="badge bg-secondary">{{ dividends.count }}</span></h5>
 
     <!--    таблица-->
@@ -91,7 +97,7 @@
           </thead>
           <tbody>
           <tr v-for="(div, index) in dividends.results" :key="div.id">
-            <th>{{ (index + 1)+(currentPage-1)*pageSize }}</th>
+            <th>{{ (index + 1) + (qParams.page - 1) * qParams.page_size }}</th>
             <td><img class="icon_min img-thumbnail" :src="div.company.icon_image" alt=""></td>
             <td>{{ div.company.ticker }}</td>
             <td>{{ div.company.name }}</td>
@@ -100,8 +106,10 @@
             <td>{{ localeDate(div.date_of_receipt) }}</td>
             <td>{{ div.account.name }}</td>
             <td>
-              <router-link :to="{ name: 'edit_dividend', params: { id: div.id }, query:{r_page:this.currentPage}}"><i
-                  class="text-black bi-pencil fs-4"></i></router-link>
+              <router-link
+                  :to="{ name: 'edit_dividend', params: { id: div.id }, query: qParams}">
+                <i
+                    class="text-black bi-pencil fs-4"></i></router-link>
             </td>
             <td>
               <router-link to="" @click="idForDelete = div.id" data-bs-toggle="modal" data-bs-target="#deleteModal">
@@ -122,19 +130,19 @@
                aria-label="Выбор количества записей не страницу">
             <div class="input-group-text" id="btnGroupAddon">Показывать по</div>
 
-            <input @change="currentPage = 1; fetchDividends()" v-model="pageSize" value="10" type="radio"
+            <input @change="qParams.page = 1; fetchDividends()" v-model="qParams.page_size" value="10" type="radio"
                    class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
             <label class="btn btn-outline-primary" for="btnradio1">10</label>
 
-            <input @change="currentPage = 1; fetchDividends()" v-model="pageSize" value="20" type="radio"
+            <input @change="qParams.page = 1; fetchDividends()" v-model="qParams.page_size" value="20" type="radio"
                    class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
             <label class="btn btn-outline-primary" for="btnradio2">20</label>
 
-            <input @change="currentPage = 1; fetchDividends()" v-model="pageSize" value="50" type="radio"
+            <input @change="qParams.page = 1; fetchDividends()" v-model="qParams.page_size" value="50" type="radio"
                    class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
             <label class="btn btn-outline-primary" for="btnradio3">50</label>
 
-            <input @change="currentPage = 1; fetchDividends()" v-model="pageSize" value="100" type="radio"
+            <input @change="qParams.page = 1; fetchDividends()" v-model="qParams.page_size" value="100" type="radio"
                    class="btn-check" name="btnradio" id="btnradio4" autocomplete="off">
             <label class="btn btn-outline-primary" for="btnradio4">100</label>
           </div>
@@ -144,44 +152,41 @@
       <div class="col-6">
         <Vue3BsPaginate
             class="fw-bold"
+            :key="qParams.page"
             :total="dividends.count"
-            v-model="currentPage"
-            :perPage="pageSize"
+            v-model="qParams.page"
+            :perPage="qParams.page_size"
             :onChange="fetchDividends"
             alignment="center"
         />
+        {{ qParams.page }}
       </div>
     </div>
   </div>
+
 </template>
 
 <script>
-import Datepicker from 'vue3-datepicker'
-import {ru} from 'date-fns/locale'
-
 export default {
   name: "Dividends",
   data: () => ({
     idForDelete: null,
     loading: true,
-    search: '',
-    currentPage: 1,
-    pageSize: 10,
-    datepicker: {
-      start: null,
-      end: null,
-      ru: ru,
-      upperLimit: new Date(),
-      inputFormat: 'dd MMMM yyyy',
-      typeable: true
-    }
+    qParams: {
+      page: 1,
+      page_size: 10,
+      date_start: '',
+      date_end: '',
+      search: '',
+    },
   }),
   async mounted() {
-    if (this.$route.query.r_page) {
-      this.currentPage = this.$route.query.r_page
+    if (this.$route.query) {
+      this.qParams = {...this.qParams, ...this.$route.query}
+      this.qParams.page = parseInt(this.qParams.page)
     }
-    await this.fetchDividends()
 
+    await this.fetchDividends();
   },
   computed: {
     dividends() {
@@ -192,12 +197,12 @@ export default {
     async fetchDividends() {
       try {
         await this.$store.dispatch('fetchDividends', {
-          page: this.currentPage,
-          page_size: this.pageSize,
-          search: this.search,
+          page: this.qParams.page,
+          page_size: this.qParams.page_size,
+          search: this.qParams.search,
           // приведение даты к виду '2010-01-01'
-          start: this.datepicker.start ? this.datepicker.start.toLocaleDateString("en-CA") : '2010-01-01',
-          end: this.datepicker.end ? this.datepicker.end.toLocaleDateString("en-CA") : new Date().toLocaleDateString("en-CA")
+          date_start: this.qParams.date_start ? this.qParams.date_start : '2010-01-01',
+          date_end: this.qParams.date_end ? this.qParams.date_end : new Date().toLocaleDateString("en-CA")
         })
         this.loading = false
       } catch (e) {
@@ -219,12 +224,8 @@ export default {
         year: 'numeric', month: 'long', day: 'numeric'
       })
     },
-  },
-  components: {
-    Datepicker
   }
 }
 </script>
 <style>
-
 </style>

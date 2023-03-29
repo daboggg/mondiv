@@ -202,7 +202,8 @@ export default {
       }
       try {
         if (this.id) {
-          await this.$store.dispatch('editDividend', {formData, id:this.editableDividend.id});
+          await this.$store.dispatch('editDividend', {formData, id: this.editableDividend.id});
+          await this.$router.push({name:'dividends', query: this.$route.query})
         }else {
           await this.$store.dispatch('addDividend', formData);
         }

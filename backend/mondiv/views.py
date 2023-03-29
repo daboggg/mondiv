@@ -36,7 +36,7 @@ class DividendList(generics.ListCreateAPIView):
             Q(company__name__icontains=params.get('search')) | Q(company__ticker__icontains=params.get('search')) | Q(
                 account__name__icontains=params.get('search')),
             user=self.request.user,
-            date_of_receipt__range=[params.get('start'), params.get('end')],
+            date_of_receipt__range=[params.get('date_start'), params.get('date_end')],
 
         ).order_by('id')
 

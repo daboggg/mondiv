@@ -28,7 +28,7 @@ export default {
           },
           searchParams: {
             ...params,
-            ...router.currentRoute.value.query,
+            // ...router.currentRoute.value.query,
           }
         }).json()
         commit('setDividends', res)
@@ -114,11 +114,6 @@ export default {
           json:formData
         })
         commit('setMessage', 'Данные изменены')
-        if (router.currentRoute.value.query && router.currentRoute.value.query.r_page) {
-          await router.push(`/dividends?r_page=${router.currentRoute.value.query.r_page}`);
-        } else {
-          await router.push(`/dividends`);
-        }
       } catch (error) {
         if (error.message === 'Request failed with status code 401 Unauthorized') {
           commit('logout')
