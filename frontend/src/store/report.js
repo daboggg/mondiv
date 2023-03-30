@@ -57,5 +57,66 @@ export default {
         }
       }
     },
+    async addReport({commit, getters}, formData){
+      try {
+        await report.post('reports/', {
+          headers: {
+            Authorization: `Token ${getters.token}`
+          },
+          json: formData
+        }).json()
+        commit('setMessage', "Отчет добавлен")
+      } catch (error) {
+        if (error.message === 'Request failed with status code 401 Unauthorized') {
+          commit('logout')
+          await router.push('/login')
+        }
+        if (error.name === 'HTTPError') {
+          const errorJson = await error.response.json();
+          commit('setError', errorMessageExtractor(errorJson))
+          throw error
+        }
+      }
+    },
+    async getReport({commit, getters}, id) {
+      try {
+        return  await report(`reports/${id}/`, {
+          headers: {
+            Authorization: `Token ${getters.token}`
+          }
+        }).json()
+      } catch (error) {
+        if (error.message === 'Request failed with status code 401 Unauthorized') {
+          commit('logout')
+          await router.push('/login')
+        }
+        if (error.name === 'HTTPError') {
+          const errorJson = await error.response.json();
+          commit('setError', errorMessageExtractor(errorJson))
+          throw error
+        }
+      }
+    },
+    async editReport({commit, getters}, {formData,id}) {
+      try {
+        await report.put(`reports/${id}/`, {
+          headers: {
+            Authorization: `Token ${getters.token}`
+          },
+          json:formData
+        })
+        commit('setMessage', 'Данные изменены')
+      } catch (error) {
+        if (error.message === 'Request failed with status code 401 Unauthorized') {
+          commit('logout')
+          await router.push('/login')
+        }
+        if (error.name === 'HTTPError') {
+          const errorJson = await error.response.json();
+          commit('setError', errorMessageExtractor(errorJson))
+          throw error
+        }
+      }
+    }
   }
 }

@@ -89,10 +89,10 @@
             <td>{{ report.currency.name }}</td>
             <td>{{ localeDate(report.report_date) }}</td>
             <td>{{ report.amount }}</td>
-            <!--            <td>-->
-            <!--              <router-link :to="{ name: 'edit_dividend', params: { id: div.id }, query:{r_page:this.currentPage}}"><i-->
-            <!--                  class="text-black bi-pencil fs-4"></i></router-link>-->
-            <!--            </td>-->
+                        <td>
+                          <router-link :to="{ name: 'edit_report', params: { id: report.id }, query: qParams}"><i
+                              class="text-black bi-pencil fs-4"></i></router-link>
+                        </td>
             <td>
               <router-link to="" @click="idForDelete = report.id" data-bs-toggle="modal" data-bs-target="#deleteModal">
                 <i class="bi-x-lg fs-4 text-danger"></i>
@@ -161,6 +161,11 @@ export default {
     },
   }),
   async mounted() {
+
+    if (this.$route.query) {
+      this.qParams = {...this.qParams, ...this.$route.query}
+      this.qParams.page = parseInt(this.qParams.page)
+    }
 
     await this.fetchReports()
 

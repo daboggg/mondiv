@@ -41,6 +41,19 @@ const routes = [
     component: () => import('../views/Reports')
   },
   {
+    path: '/edit_report/:id',
+    name: 'edit_report',
+    meta: {layout: 'main', auth: true},
+    props: true,
+    component: () => import('../views/AddOrEditReport')
+  },
+  {
+    path: '/add_report',
+    name: 'add_report',
+    meta: {layout: 'main', auth: true},
+    component: () => import('../views/AddOrEditReport')
+  },
+  {
     path: '/login',
     name: 'login',
     meta: {layout: 'empty'},

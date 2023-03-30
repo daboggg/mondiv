@@ -20,6 +20,9 @@
             <router-link class="nav-link" aria-current="page" to="/dividends">Полученные дивиденды</router-link>
           </li>
           <li class="nav-item">
+            <router-link class="nav-link" aria-current="page" to="/add_report">Добавить отчет</router-link>
+          </li>
+          <li class="nav-item">
             <router-link class="nav-link" aria-current="page" to="/reports">Отчеты</router-link>
           </li>
         </ul>

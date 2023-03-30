@@ -143,6 +143,13 @@ class ReportList(generics.ListCreateAPIView):
             report_date__range=[params.get('date_start'), params.get('date_end')],
         ).order_by('id')
 
+    def post(self, request, *args, **kwargs):
+        serializer = ReportSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=self.request.user)
+
+        return Response({'report': serializer.data})
+
 
 class ReportDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Report.objects.all()

@@ -4,40 +4,14 @@
     <div class="row">
       <div class="col-xs-12 col-md-8 offset-md-2 col-xl-4 offset-xl-4">
         <div class="card text-white mt-5" style="background-color: #00796b">
-          <div class="h5 card-header"><i class="bi-plus-circle fs-5 me-2"></i>{{id?'Изменить':'Добавить'}} дивиденд</div>
+          <div class="h5 card-header"><i class="bi-plus-circle fs-5 me-2"></i>{{id?'Изменить':'Добавить'}} отчет</div>
           <div class="card-body">
             <form class="" @submit.prevent="submitHandler">
 
-              <!--          компания или тикер-->
-              <div class="mb-3">
-                <i class="bi-buildings fs-5 me-2"></i>
-                <label class="form-label" for="dselect-example">Компания</label>
-                <select ref="company" class="form-select" id="dselect-example">
-                  <option v-for="com in $store.getters.companies"
-                          :selected="com.id == editableDividend.company"
-                          :value="com.id">{{ com.name }} ({{ com.ticker }})
-                  </option>
-                </select>
-              </div>
-
-
-              <!--              &lt;!&ndash;          компания или тикер&ndash;&gt;-->
-              <!--              <div class="mb-3">-->
-              <!--                <i class="bi-buildings fs-5 me-2"></i>-->
-              <!--                <label class="form-label" for="id_company">Компания</label>-->
-              <!--                <select v-model="company" ref="cmp" name="company" class="form-select select-lan" title=""-->
-              <!--                        id="id_company">-->
-
-              <!--                  <option v-for="acc in $store.getters.accounts"-->
-              <!--                          :value="acc.name">{{ acc.name }}-->
-              <!--                  </option>-->
-              <!--                </select>-->
-              <!--              </div>-->
-
-              <!--              дата выплтаты-->
+              <!--              дата отчета-->
               <div class="mb-3">
                 <i class="bi-calendar3 fs-5 me-2"></i>
-                <label for="chooseDate" class="form-label">Дата</label>
+                <label for="chooseDate" class="form-label">Дата отчета</label>
                 <datepicker v-model="datepicker.date"
                             id="chooseDate"
                             :inputFormat="datepicker.inputFormat"
@@ -54,14 +28,14 @@
                 </div>
               </div>
 
-              <!--выплата-->
+              <!--сумма-->
               <div class="mb-3">
                 <i class="bi-coin fs-5 me-2"></i>
-                <label for="payment" class="form-label">Выплата</label>
-                <input v-model="payoff" type="number" step="0.01" class="form-control" id="payment">
+                <label for="payment" class="form-label">Сумма</label>
+                <input v-model="amount" type="number" step="0.01" class="form-control" id="payment">
                 <div
                     class="invalid form-text"
-                    v-for="e in v$.payoff.$errors"
+                    v-for="e in v$.amount.$errors"
                     :key="e.$uid"
                 >{{ e.$message }}
                 </div>
@@ -121,11 +95,11 @@ import {useVuelidate} from "@vuelidate/core"
 import {helpers, required} from "@vuelidate/validators";
 import {ru} from "date-fns/locale";
 import Datepicker from 'vue3-datepicker'
-import moment from "moment";
+import moment from 'moment'
 
 
 export default {
-  name: "AddOrEditDividend",
+  name: "AddOrEditReport",
   props: ['id'],
   setup() {
     return {
@@ -133,7 +107,7 @@ export default {
     }
   },
   data: () => ({
-    payoff: '',
+    amount: '',
     account: '',
     currency: '',
     datepicker: {
@@ -143,7 +117,7 @@ export default {
       inputFormat: 'dd MMMM yyyy',
       typeable: false
     },
-    editableDividend: {}
+    editableReport: {}
   }),
   validations() {
     return {
@@ -153,7 +127,7 @@ export default {
       currency: {
         required: helpers.withMessage('Полe не может быть пустым', required)
       },
-      payoff: {
+      amount: {
         required: helpers.withMessage('Полe не может быть пустым', required)
       },
       datepicker: {
@@ -163,56 +137,45 @@ export default {
       }
     }
   },
-  computed: {},
   async mounted() {
     try {
       if (this.id) {
-        this.editableDividend = await this.$store.dispatch('getDividend', this.id);
-        this.account = this.editableDividend.account
-        this.currency = this.editableDividend.currency
-        this.payoff = this.editableDividend.payoff
-        this.datepicker.date = new Date(this.editableDividend.date_of_receipt)
+        this.editableReport = await this.$store.dispatch('getReport', this.id);
+        this.account = this.editableReport.account
+        this.currency = this.editableReport.currency
+        this.amount = this.editableReport.amount
+        this.datepicker.date = new Date(this.editableReport.report_date)
       }
       await this.$store.dispatch('fetchAccounts')
       await this.$store.dispatch('fetchCurrencies')
-      await this.$store.dispatch('fetchCompanies')
 
     } catch (e) {
       console.log(e)
     }
-    dselect(document.querySelector('#dselect-example'), {
-      search: true
-    })
-    // $(".select-lan").select2({
-    //   theme: "bootstrap-5",
-    // dropdownCssClass: "select2--small",
-    // })
-
   },
   methods: {
     async submitHandler() {
       const isFormCorrect = await this.v$.$validate()
       if (!isFormCorrect) return
       const formData = {
-        company: this.$refs.company.value,
         // приведение даты к виду '2010-01-01'
-        date_of_receipt: moment(this.datepicker.date).format('YYYY-MM-DD'),
-        payoff: this.payoff,
+        report_date: moment(this.datepicker.date).format('YYYY-MM-DD'),
+        amount: this.amount,
         currency: this.currency,
         account: this.account
       }
       try {
         if (this.id) {
-          await this.$store.dispatch('editDividend', {formData, id: this.editableDividend.id});
-          await this.$router.push({name:'dividends', query: this.$route.query})
+          await this.$store.dispatch('editReport', {formData, id: this.editableReport.id});
+          await this.$router.push({name:'reports', query: this.$route.query})
         }else {
-          await this.$store.dispatch('addDividend', formData);
+          await this.$store.dispatch('addReport', formData);
         }
       } catch (e) {
         console.log(e)
       } finally {
         this.datepicker.date = null
-        this.payoff = ''
+        this.amount = ''
         this.account = ''
         this.currency = ''
         this.v$.$reset()

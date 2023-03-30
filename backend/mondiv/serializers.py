@@ -65,6 +65,9 @@ class ReportListSerializer(serializers.ModelSerializer):
 class ReportSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source='user.username')
 
+    def create(self, validated_data):
+        return Report.objects.create(**validated_data)
+
     class Meta:
         model = Report
         fields = '__all__'
