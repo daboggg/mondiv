@@ -140,5 +140,5 @@ class ReportList(generics.ListCreateAPIView):
         params = self.request.query_params
         return Report.objects.filter(
             user=self.request.user,
-            report_date__range=[params.get('start'), params.get('end')],
+            report_date__range=[params.get('date_start'), params.get('date_end')],
         ).order_by('id')

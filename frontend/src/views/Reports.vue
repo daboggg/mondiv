@@ -37,33 +37,38 @@
 
     <!--    выбор по дате-->
     <div class="row">
-      <form class="input-group justify-content-center my-4" @submit.prevent="currentPage = 1; fetchReports()">
-        <span class="input-group-text">С</span>
-        <datepicker v-model="datepicker.start"
-                    :inputFormat="datepicker.inputFormat"
-                    :locale="datepicker.ru"
-                    :upperLimit="datepicker.upperLimit"
-                    class="form-control"
-        />
-        <button type="button" @click="datepicker.start = null" class="btn btn-light ms-1"><i
-            class="bi-x-lg text-danger"></i></button>
-        <span class="input-group-text ms-3">По</span>
-        <datepicker v-model="datepicker.end"
-                    :inputFormat="datepicker.inputFormat"
-                    :locale="datepicker.ru"
-                    :upperLimit="datepicker.upperLimit"
-                    class="form-control"
-        />
-        <button type="button" @click="datepicker.end = null" class="btn btn-light ms-1"><i
-            class="bi-x-lg text-danger"></i></button>
-        <button class="btn btn-light ms-3 btn-outline-dark" type="submit">Выбрать</button>
-      </form>
+      <div class="col-md-12 col-xl-8 offset-xl-2">
+        <form class=" input-group justify-content-center my-4" @submit.prevent="qParams.page = 1; fetchReports()">
+
+          <span class="input-group-text">С</span>
+          <input v-model="qParams.date_start" type="date"
+                 class="form-control" min="2019-01-01"
+                 :max="new Date().toLocaleDateString('en-CA')"
+                 style="font-weight: bold"
+          />
+          <button type="button" @click="qParams.date_start = ''; fetchReports()"
+                  class="input-group-btn btn btn-light ms-1"><i
+              class="bi-x-lg text-danger"></i></button>
+
+          <span class="input-group-text ms-3">По</span>
+          <input v-model="qParams.date_end" type="date"
+                 class="form-control" min="2019-01-01"
+                 :max="new Date().toLocaleDateString('en-CA')"
+                 style="font-weight: bold"
+
+          />
+          <button type="button" @click="qParams.date_end = ''; fetchReports()"
+                  class="input-group-btn btn btn-light ms-1"><i
+              class="bi-x-lg text-danger"></i></button>
+
+          <button class="btn btn-light ms-3 btn-outline-dark" type="submit">Выбрать</button>
+        </form>
+      </div>
     </div>
 
-<!--    счетчик записей-->
+    <!--    счетчик записей-->
     <h5 class="ms-3 my-3">Записей: <span class="badge bg-secondary">{{ reports.count }}</span></h5>
 
-    {{reports}}
     <!--    таблица-->
     <div class="row">
       <div class="col-12">
@@ -79,15 +84,15 @@
           </thead>
           <tbody>
           <tr v-for="(report, index) in reports.results" :key="report.id">
-            <th>{{ (index + 1)+(currentPage-1)*pageSize }}</th>
+            <th>{{ (index + 1) + (qParams.page - 1) * qParams.page_size }}</th>
             <td>{{ report.account.name }}</td>
             <td>{{ report.currency.name }}</td>
-            <td>{{ localeDate(report.report_date)}}</td>
-            <td>{{ report.amount}}</td>
-<!--            <td>-->
-<!--              <router-link :to="{ name: 'edit_dividend', params: { id: div.id }, query:{r_page:this.currentPage}}"><i-->
-<!--                  class="text-black bi-pencil fs-4"></i></router-link>-->
-<!--            </td>-->
+            <td>{{ localeDate(report.report_date) }}</td>
+            <td>{{ report.amount }}</td>
+            <!--            <td>-->
+            <!--              <router-link :to="{ name: 'edit_dividend', params: { id: div.id }, query:{r_page:this.currentPage}}"><i-->
+            <!--                  class="text-black bi-pencil fs-4"></i></router-link>-->
+            <!--            </td>-->
             <td>
               <router-link to="" @click="idForDelete = report.id" data-bs-toggle="modal" data-bs-target="#deleteModal">
                 <i class="bi-x-lg fs-4 text-danger"></i>
@@ -107,19 +112,19 @@
                aria-label="Выбор количества записей не страницу">
             <div class="input-group-text" id="btnGroupAddon">Показывать по</div>
 
-            <input @change="currentPage = 1; fetchReports()" v-model="pageSize" value="10" type="radio"
+            <input @change="qParams.page = 1; fetchReports()" v-model="qParams.page_size" value="10" type="radio"
                    class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
             <label class="btn btn-outline-primary" for="btnradio1">10</label>
 
-            <input @change="currentPage = 1; fetchReports()" v-model="pageSize" value="20" type="radio"
+            <input @change="qParams.page = 1; fetchReports()" v-model="qParams.page_size" value="20" type="radio"
                    class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
             <label class="btn btn-outline-primary" for="btnradio2">20</label>
 
-            <input @change="currentPage = 1; fetchReports()" v-model="pageSize" value="50" type="radio"
+            <input @change="qParams.page = 1; fetchReports()" v-model="qParams.page_size" value="50" type="radio"
                    class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
             <label class="btn btn-outline-primary" for="btnradio3">50</label>
 
-            <input @change="currentPage = 1; fetchReports()" v-model="pageSize" value="100" type="radio"
+            <input @change="qParams.page = 1; fetchReports()" v-model="qParams.page_size" value="100" type="radio"
                    class="btn-check" name="btnradio" id="btnradio4" autocomplete="off">
             <label class="btn btn-outline-primary" for="btnradio4">100</label>
           </div>
@@ -130,8 +135,8 @@
         <Vue3BsPaginate
             class="fw-bold"
             :total="reports.count"
-            v-model="currentPage"
-            :perPage="pageSize"
+            v-model="qParams.page"
+            :perPage="qParams.page_size"
             :onChange="fetchReports"
             alignment="center"
         />
@@ -141,47 +146,35 @@
 </template>
 
 <script>
-import Datepicker from 'vue3-datepicker'
-import {ru} from 'date-fns/locale'
 
 export default {
   name: "Dividends",
   data: () => ({
     idForDelete: null,
-    // loading: true,
-    currentPage: 1,
-    pageSize: 10,
-    reports:[],
-    datepicker: {
-      start: null,
-      end: null,
-      ru: ru,
-      upperLimit: new Date(),
-      inputFormat: 'dd MMMM yyyy',
-      typeable: true
-    }
+    loading: true,
+    reports: [],
+    qParams: {
+      page: 1,
+      page_size: 10,
+      date_start: '',
+      date_end: '',
+    },
   }),
   async mounted() {
-    if (this.$route.query.r_page) {
-      this.currentPage = this.$route.query.r_page
-    }
+
     await this.fetchReports()
 
   },
-  computed: {
-    // dividends() {
-    //   return this.$store.getters.dividends
-    // },
-  },
   methods: {
     async fetchReports() {
+      // console.log(new Date().toISOString().split('T')[0])
       try {
         this.reports = await this.$store.dispatch('fetchReports', {
-          page: this.currentPage,
-          page_size: this.pageSize,
-          // приведение даты к виду '2010-01-01'
-          start: this.datepicker.start ? this.datepicker.start.toLocaleDateString("en-CA") : '2010-01-01',
-          end: this.datepicker.end ? this.datepicker.end.toLocaleDateString("en-CA") : new Date().toLocaleDateString("en-CA")
+          page: this.qParams.page,
+          page_size: this.qParams.page_size,
+          // приведение даты к виду '2010-01-01' (.toISOString().split('T')[0])
+          date_start: this.qParams.date_start ? this.qParams.date_start : '2010-01-01',
+          date_end: this.qParams.date_end ? this.qParams.date_end : new Date().toISOString().split('T')[0]
         })
         this.loading = false
       } catch (e) {
@@ -203,9 +196,6 @@ export default {
         year: 'numeric', month: 'long', day: 'numeric'
       })
     },
-  },
-  components: {
-    Datepicker
   }
 }
 </script>

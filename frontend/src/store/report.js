@@ -22,7 +22,7 @@ export default {
           },
           searchParams:{
             ...params,
-            ...router.currentRoute.value.query,
+            // ...router.currentRoute.value.query,
           }
         }).json()
       } catch (error) {

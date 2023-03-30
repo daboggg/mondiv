@@ -38,7 +38,7 @@
     <!--    выбор по дате-->
     <div class="row">
       <div class="col-md-12 col-xl-8 offset-xl-2">
-        <form class=" input-group justify-content-center my-4" @submit.prevent="currentPage = 1; fetchDividends()">
+        <form class=" input-group justify-content-center my-4" @submit.prevent="qParams.page = 1; fetchDividends()">
 
         <span class="input-group-text">С</span>
         <input v-model="qParams.date_start" type="date"
@@ -200,9 +200,9 @@ export default {
           page: this.qParams.page,
           page_size: this.qParams.page_size,
           search: this.qParams.search,
-          // приведение даты к виду '2010-01-01'
+          // приведение даты к виду '2010-01-01' (.toISOString().split('T')[0])
           date_start: this.qParams.date_start ? this.qParams.date_start : '2010-01-01',
-          date_end: this.qParams.date_end ? this.qParams.date_end : new Date().toLocaleDateString("en-CA")
+          date_end: this.qParams.date_end ? this.qParams.date_end : new Date().toISOString().split('T')[0]
         })
         this.loading = false
       } catch (e) {

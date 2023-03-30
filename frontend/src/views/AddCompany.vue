@@ -53,7 +53,7 @@
 
     <div v-else>
       <!--    счетчик записей-->
-      <h5 class="ms-3 my-3">Компаний: <span class="badge bg-secondary">{{ companies.count }}</span></h5>
+      <h5 class="ms-3 my-3">Записей: <span class="badge bg-secondary">{{ companies.count }}</span></h5>
 
       <!--  таблица-->
       <div class="row mx-3">
