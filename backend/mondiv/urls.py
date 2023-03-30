@@ -11,4 +11,5 @@ urlpatterns = [
     path('companies_with_pagination/', CompanyListWithPagination.as_view()),
     path('companies/', CompanyList.as_view()),
     path('reports/', ReportList.as_view()),
+    path('reports/<int:pk>/', ReportDetail.as_view()),
 ]

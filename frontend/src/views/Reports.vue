@@ -25,7 +25,7 @@
           <div class="modal-footer">
             <button @click="idForDelete = null" type="button" class="btn btn-teal" data-bs-dismiss="modal">Отменить
             </button>
-            <button @click="deleteDividend" type="button" class="btn btn-danger" data-bs-dismiss="modal">Удалить
+            <button @click="deleteReport" type="button" class="btn btn-danger" data-bs-dismiss="modal">Удалить
             </button>
           </div>
         </div>
@@ -181,9 +181,9 @@ export default {
         console.log(e)
       }
     },
-    async deleteDividend() {
+    async deleteReport() {
       try {
-        await this.$store.dispatch('deleteDividend', this.idForDelete);
+        await this.$store.dispatch('deleteReport', this.idForDelete);
         this.fetchReports()
       } catch (e) {
         console.log(e)

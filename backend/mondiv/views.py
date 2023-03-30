@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from mondiv.models import Dividend, Currency, Account, Company, Report
 from mondiv.permissions import IsOwner
 from mondiv.serializers import DividendListSerializer, CurrencySerializer, AccountSerializer, DividendSerializer, \
-    CompanyListSerializer, ReportListSerializer
+    CompanyListSerializer, ReportListSerializer, ReportSerializer
 from mondiv.utils import client
 
 
@@ -142,3 +142,9 @@ class ReportList(generics.ListCreateAPIView):
             user=self.request.user,
             report_date__range=[params.get('date_start'), params.get('date_end')],
         ).order_by('id')
+
+
+class ReportDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Report.objects.all()
+    serializer_class = ReportSerializer
+    permission_classes = [IsAuthenticated, IsOwner]

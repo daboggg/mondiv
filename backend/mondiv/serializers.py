@@ -60,3 +60,11 @@ class ReportListSerializer(serializers.ModelSerializer):
         model = Report
         fields = '__all__'
         depth = 1
+
+
+class ReportSerializer(serializers.ModelSerializer):
+    user = serializers.ReadOnlyField(source='user.username')
+
+    class Meta:
+        model = Report
+        fields = '__all__'

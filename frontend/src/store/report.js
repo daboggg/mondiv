@@ -37,5 +37,25 @@ export default {
         }
       }
     },
+    async deleteReport({commit, getters}, id) {
+      try {
+        await report.delete(`reports/${id}/`, {
+          headers: {
+            Authorization: `Token ${getters.token}`
+          }
+        })
+        commit('setMessage', 'Успешно удалено')
+      } catch (error) {
+        if (error.message === 'Request failed with status code 401 Unauthorized') {
+          commit('logout')
+          await router.push('/login')
+        }
+        if (error.name === 'HTTPError') {
+          const errorJson = await error.response.json();
+          commit('setError', errorMessageExtractor(errorJson))
+          throw error
+        }
+      }
+    },
   }
 }
