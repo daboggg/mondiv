@@ -124,6 +124,11 @@ class CompanyListWithPagination(generics.ListCreateAPIView):
         ).order_by('id')
 
 
+class CompanyDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Company.objects.all()
+    serializer_class = CompanyListSerializer
+
+
 ######### Company ###############################
 class ReportListPagination(PageNumberPagination):
     page_size = 10

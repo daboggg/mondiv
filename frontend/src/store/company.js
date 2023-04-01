@@ -71,6 +71,21 @@ export default {
           throw error
         }
       }
-    }
+    },
+    async getCompany({commit, getters}, id) {
+      try {
+        return await company(`companies/${id}/`).json()
+      } catch (error) {
+        if (error.message === 'Request failed with status code 401 Unauthorized') {
+          commit('logout')
+          await router.push('/login')
+        }
+        if (error.name === 'HTTPError') {
+          const errorJson = await error.response.json();
+          commit('setError', errorMessageExtractor(errorJson))
+          throw error
+        }
+      }
+    },
   }
 }

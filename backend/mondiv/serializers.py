@@ -7,7 +7,7 @@ from mondiv.models import Dividend, Company, Currency, Account, Report
 class CompanyListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Company
-        fields = ['id','name', 'icon_image', 'ticker']
+        fields = ['id','name', 'icon_image', 'ticker', 'description']
 
 
 ############ Currency ###################################

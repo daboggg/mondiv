@@ -75,7 +75,9 @@
               <td>{{ com.ticker }}</td>
               <td>{{ com.name }}</td>
               <td>
-                <router-link to>sss</router-link>
+                <router-link :to="{name:'company', params: { id: com.id }}">
+                  <i class="ms-4  bi-box-arrow-in-right fs-3 text-black"></i>
+                </router-link>
               </td>
             </tr>
             </tbody>
