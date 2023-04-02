@@ -7,42 +7,129 @@
   </div>
 
   <div v-else class="container p-3 my-3 bg-body">
-    {{company}}
-    <bar
-        id="my-chart-id"
-        :options="chartOptions"
-        :data="chartData"
-    />
+    <div class="col text-center my-5 display-6">Информация о компании: {{ company.name }}</div>
+    <div class="row">
+      <div class="col">
+        <div class="card row ms-2 me-1">
+          <div v-if="loadingChart" class="card-body text-center my-5">
+            <div class="spinner-border text-success" role="status">
+              <span class="visually-hidden">Загрузка...</span>
+            </div>
+          </div>
+          <bar
+              v-else
+              id="my-chart-id"
+              :key="chartData.labels"
+              :options="chartOptions"
+              :data="chartData"
+          />
+          <div class="card-footer text-muted">
+            <div class="input-group justify-content-center">
+              <span class="input-group-text" id="basic-addon1"> Последние </span>
+              <div class="btn-group" role="group" aria-label="limit dividends">
+                <input @change="dividendHistory()" v-model="limit" value="10" type="radio" class="btn-check"
+                       name="btnradio" id="btnradio1" autocomplete="off" checked>
+                <label class="btn btn-outline-primary" for="btnradio1">10</label>
+
+                <input @change="dividendHistory()" v-model="limit" value="20" type="radio" class="btn-check"
+                       name="btnradio" id="btnradio2" autocomplete="off">
+                <label class="btn btn-outline-primary" for="btnradio2">20</label>
+
+                <input @change="dividendHistory()" v-model="limit" value="40" type="radio" class="btn-check"
+                       name="btnradio" id="btnradio3" autocomplete="off">
+                <label class="btn btn-outline-primary" for="btnradio3">40</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card row ms-1 me-2">
+          <div class="col-4 offset-4 mt-4">
+            <img v-if="company.icon_image" :src="company.icon_image" class=" card-img-top" alt="...">
+            <img v-else src="https://i.postimg.cc/bwSyqTTF/empty.jpg" class="card-img-top" alt="...">
+          </div>
+          <div class="card-body">
+            <h3 class="card-title text-center">{{ company.name }}</h3>
+            <h4 class="card-subtitle mb-2 text-muted text-center">Тикер: {{ company.ticker }}</h4>
+            <p class="card-text">{{ company.description }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
 <script>
-import { Bar } from 'vue-chartjs'
+import {Bar} from 'vue-chartjs'
 import {Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale} from 'chart.js';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
+ChartJS.defaults.backgroundColor = 'rgba(0,121,107,0.64)';
 
 export default {
   name: "Company",
-  props:['id'],
-  data:()=>({
+  props: ['id'],
+  data: () => ({
+    limit: 10,
     loading: true,
+    loadingChart: true,
     company: {},
     chartData: {
-        labels: [ 'January', 'February', 'March' ],
-        datasets: [ { data: [40, 20, 12] } ]
+      labels: [],
+      datasets: []
+    },
+    chartOptions: {
+      maintainAspectRatio: true,
+      aspectRatio: 1,
+      layout: {
+        padding: 5
       },
-      chartOptions: {
-        responsive: true
+      plugins: {
+        legend: {
+          display: false,
+        },
+        tooltip: {
+          titleFont: {
+            size: 20
+          }
+        },
+        title: {
+          font: {
+            size: 30
+          },
+          display: true,
+          text: ''
+        }
       }
+    },
+
   }),
   async mounted() {
-    this.company = await this.$store.dispatch('getCompany', this.id)
-    this.loading = false
+    try {
+      this.company = await this.$store.dispatch('getCompany', this.id)
+      await this.dividendHistory()
+      this.loading = false
+    } catch (e) {
+      console.log(e)
+    }
   },
-  components:{
+  methods: {
+    async dividendHistory() {
+      this.loadingChart = true
+      this.chartOptions.plugins.title.text = `Дивиденды, последние ${this.limit} выплат`;
+      const res = (await this.$store.dispatch('dividendHistory', {limit: this.limit, ticker: this.company.ticker})).res;
+      this.chartData = {
+        labels: res[1],
+        datasets: [{data: res[0], label: 'выплата'}]
+      }
+      this.loadingChart = false
+    },
+  },
+  components: {
     Bar
-  }
+  },
 }
 </script>
 

@@ -6,6 +6,7 @@ urlpatterns = [
     path('test/', test),
     path('dividends/<int:pk>/', DividendDetail.as_view()),
     path('dividends/', DividendList.as_view()),
+    path('dividend_history/', dividend_history),
     path('currencies/', CurrencyList.as_view()),
     path('accounts/', AccountList.as_view()),
     path('companies_with_pagination/', CompanyListWithPagination.as_view()),

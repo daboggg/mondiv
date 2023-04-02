@@ -125,6 +125,31 @@ export default {
           throw error
         }
       }
-    }
+    },
+    async dividendHistory({commit, getters}, params) {
+      try {
+        const res = await dividend('dividend_history/', {
+          headers: {
+            Authorization: `Token ${getters.token}`
+          },
+          searchParams: {
+            ...params,
+            // ...router.currentRoute.value.query,
+          }
+        }).json()
+        // commit('setDividends', res)
+        return res
+      } catch (error) {
+         if (error.message === 'Request failed with status code 401 Unauthorized') {
+          commit('logout')
+          await router.push('/login')
+        }
+        if (error.name === 'HTTPError') {
+          const errorJson = await error.response.json();
+          commit('setError', errorMessageExtractor(errorJson))
+          throw error
+        }
+      }
+    },
   }
 }
