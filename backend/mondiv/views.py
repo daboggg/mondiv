@@ -70,7 +70,7 @@ def dividend_history(request):
     #                 'display': 0,
     #                 'labels': {
     #                     'font': {
-    #                         'size': 18
+    #                         'size': 17
     #                     }
     #                 },
     #             },
