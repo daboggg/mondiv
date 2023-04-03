@@ -98,7 +98,11 @@
           <tbody>
           <tr v-for="(div, index) in dividends.results" :key="div.id">
             <th>{{ (index + 1) + (qParams.page - 1) * qParams.page_size }}</th>
-            <td><img class="icon_min img-thumbnail" :src="div.company.icon_image" alt=""></td>
+            <td>
+              <router-link :to="{name:'company', params: { id: div.company.id }}">
+                <img class="icon_min img-thumbnail" :src="div.company.icon_image" alt="">
+              </router-link>
+            </td>
             <td>{{ div.company.ticker }}</td>
             <td>{{ div.company.name }}</td>
             <td>{{ div.currency.name }}</td>
@@ -159,7 +163,6 @@
             :onChange="fetchDividends"
             alignment="center"
         />
-        {{ qParams.page }}
       </div>
     </div>
   </div>

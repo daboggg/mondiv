@@ -58,6 +58,83 @@
       </div>
     </div>
 
+    <div v-if="!dividends.count" class="col text-center my-5 display-6">Полученных дивидендов нет</div>
+    <div v-else class="row">
+      <div class="col-10 offset-1 mt-5">
+        <div class="col text-center my-5 display-6">Полученные дивиденды:</div>
+
+
+        <!--    счетчик записей-->
+        <h5 class="ms-3 my-3">Записей: <span class="badge bg-secondary">{{ dividends.count }}</span></h5>
+
+        <!--    таблица-->
+        <div class="row">
+          <div class="col-12">
+            <table class="table align-middle">
+              <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Дата выплаты</th>
+                <th scope="col">Сумма</th>
+                <th scope="col">Валюта</th>
+                <th scope="col">Счет</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr v-for="(div, index) in dividends.results" :key="div.id">
+                <th>{{ (index + 1) + (qParams.page - 1) * qParams.page_size }}</th>
+                <td>{{ div.date_of_receipt }}</td>
+                <td>{{ div.payoff }}</td>
+                <td>{{ div.currency.name }}</td>
+                <td>{{ div.account.name }}</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="row my-5">
+          <!--      выбор количества записей на страницу-->
+          <div class="col-6">
+            <div class="row justify-content-end">
+              <div class="btn-group col-10 align-items-center" role="group"
+                   aria-label="Выбор количества записей не страницу">
+                <div class="input-group-text" id="btnGroupAddon">Показывать по</div>
+
+                <input @change="qParams.page = 1; fetchDividends()" v-model="qParams.page_size" value="10" type="radio"
+                       class="btn-check" name="btnradio" id="btnradio11" autocomplete="off" checked>
+                <label class="btn btn-outline-primary" for="btnradio11">10</label>
+
+                <input @change="qParams.page = 1; fetchDividends()" v-model="qParams.page_size" value="20" type="radio"
+                       class="btn-check" name="btnradio" id="btnradio22" autocomplete="off">
+                <label class="btn btn-outline-primary" for="btnradio22">20</label>
+
+                <input @change="qParams.page = 1; fetchDividends()" v-model="qParams.page_size" value="50" type="radio"
+                       class="btn-check" name="btnradio" id="btnradio33" autocomplete="off">
+                <label class="btn btn-outline-primary" for="btnradio33">50</label>
+
+                <input @change="qParams.page = 1; fetchDividends()" v-model="qParams.page_size" value="100" type="radio"
+                       class="btn-check" name="btnradio" id="btnradio44" autocomplete="off">
+                <label class="btn btn-outline-primary" for="btnradio44">100</label>
+              </div>
+            </div>
+          </div>
+          <!--      пагинатор-->
+          <div class="col-6">
+            <Vue3BsPaginate
+                class="fw-bold"
+                :key="qParams.page"
+                :total="dividends.count"
+                v-model="qParams.page"
+                :perPage="qParams.page_size"
+                :onChange="fetchDividends"
+                alignment="center"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -76,6 +153,11 @@ export default {
     loading: true,
     loadingChart: true,
     company: {},
+    dividends: [],
+    qParams: {
+      page: 1,
+      page_size: 10,
+    },
     chartData: {
       labels: [],
       datasets: []
@@ -107,8 +189,14 @@ export default {
 
   }),
   async mounted() {
+    if (this.$route.query) {
+      this.qParams = {...this.qParams, ...this.$route.query}
+      this.qParams.page = parseInt(this.qParams.page)
+    }
+
     try {
       this.company = await this.$store.dispatch('getCompany', this.id)
+      await this.fetchDividends()
       await this.dividendHistory()
       this.loading = false
     } catch (e) {
@@ -116,6 +204,18 @@ export default {
     }
   },
   methods: {
+    async fetchDividends() {
+      try {
+        await this.$store.dispatch('fetchDividends', {
+          ticker: this.company.ticker,
+          page: this.qParams.page,
+          page_size: this.qParams.page_size
+        })
+        this.dividends = this.$store.getters.dividends
+      } catch (e) {
+
+      }
+    },
     async dividendHistory() {
       this.loadingChart = true
       this.chartOptions.plugins.title.text = `Дивиденды, последние ${this.limit} выплат`;

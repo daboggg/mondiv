@@ -1,5 +1,6 @@
 import json
 import os
+import datetime
 
 import requests
 from django.contrib.auth.decorators import login_required
@@ -23,7 +24,6 @@ def test(request):
 
 
 ######### Dividend ###############################
-# @login_required()
 def dividend_history(request):
     ticker = request.GET.get('ticker')
     limit = request.GET.get('limit', 40)
@@ -44,55 +44,6 @@ def dividend_history(request):
     return JsonResponse({'res':res})
 
 
-
-    # if len(res.json()['results']) != 0:
-    #     res = res.json()['results']
-    #     res = [[r['cash_amount'] for r in reversed(res)], [r['ex_dividend_date'] for r in reversed(res)]]
-    # else:
-    #     url = f'http://iss.moex.com/iss/securities/{ticker}/dividends.json'
-    #     res = requests.get(url)
-    #     res = res.json()['dividends']['data']
-    #     res = [[r[3] for r in res], [r[2] for r in res]]
-    # return JsonResponse({
-    #     'type': 'bar',
-    #     'data': {
-    #         'labels': res[1],
-    #         'datasets': [
-    #             {
-    #                 'data': res[0],
-    #                 'label': 'выплата',
-    #             },
-    #         ]
-    #     },
-    #     'options': {
-    #         'plugins': {
-    #             'legend': {
-    #                 'display': 0,
-    #                 'labels': {
-    #                     'font': {
-    #                         'size': 17
-    #                     }
-    #                 },
-    #             },
-    #             'tooltip': {
-    #                 'titleFont': {
-    #                     'size': 20
-    #                 },
-    #                 'titleAlign': 'center',
-    #                 'boxPadding': 10
-    #             },
-    #             'title': {
-    #                 'font': {
-    #                     'size': 30
-    #                 },
-    #                 'display': 'true',
-    #                 'text': f'Дивиденды, последние {limit} выплат'
-    #             },
-    #         }
-    #     }
-    # })
-
-
 class DividendListPagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = 'page_size'
@@ -106,13 +57,24 @@ class DividendList(generics.ListCreateAPIView):
 
     def get_queryset(self):
         params = self.request.query_params
+        # return Dividend.objects.filter(
+        #     Q(company__name__icontains=params.get('search')) | Q(company__ticker__icontains=params.get('search')) | Q(
+        #         account__name__icontains=params.get('search')),
+        #     user=self.request.user,
+        #     date_of_receipt__range=[params.get('date_start'), params.get('date_end')],
+        # ).order_by('id')
+        field_value_pairs = [
+            ('user', self.request.user),
+            ('date_of_receipt__range', [params.get('date_start','2010-01-01'), params.get('date_end',datetime.date.today())]),
+            ('company__ticker', params.get('ticker'))
+        ]
+        filter_options = {k: v for k, v in field_value_pairs if v}
         return Dividend.objects.filter(
-            Q(company__name__icontains=params.get('search')) | Q(company__ticker__icontains=params.get('search')) | Q(
-                account__name__icontains=params.get('search')),
-            user=self.request.user,
-            date_of_receipt__range=[params.get('date_start'), params.get('date_end')],
+            Q(company__name__icontains=params.get('search','')) | Q(company__ticker__icontains=params.get('search','')) | Q(
+                account__name__icontains=params.get('search','')),
+            **filter_options
+        )
 
-        ).order_by('id')
 
     def post(self, request, *args, **kwargs):
         serializer = DividendSerializer(data=request.data)

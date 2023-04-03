@@ -13,7 +13,7 @@ class ReportAdmin(admin.ModelAdmin):
 
 
 class DividendAdmin(admin.ModelAdmin):
-    list_display = ('id',
+    list_display = ('id', 'user',
         'company','date_of_receipt',
         'payoff'
         ,'currency','account')
