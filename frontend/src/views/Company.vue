@@ -65,10 +65,11 @@
 
 
         <!--    счетчик записей-->
-        <h5 class="ms-3 my-3">Записей: <span class="badge bg-secondary">{{ dividends.count }}</span></h5>
+        <span class="h5 ms-3 my-3">Записей: <span class="badge bg-secondary">{{ dividends.count }}</span></span>
+        <span class="h5 ms-5 my-3">Сумма: <span class="badge bg-secondary">{{ totalPayoff }}</span></span>
 
         <!--    таблица-->
-        <div class="row">
+        <div class="row mt-3">
           <div class="col-12">
             <table class="table align-middle">
               <thead>
@@ -154,6 +155,7 @@ export default {
     loadingChart: true,
     company: {},
     dividends: [],
+    totalPayoff: 0,
     qParams: {
       page: 1,
       page_size: 10,
@@ -196,6 +198,7 @@ export default {
 
     try {
       this.company = await this.$store.dispatch('getCompany', this.id)
+      this.totalPayoff = (await this.$store.dispatch('totalPayoff', {ticker: this.company.ticker})).totalPayoff
       await this.fetchDividends()
       await this.dividendHistory()
       this.loading = false
@@ -234,5 +237,7 @@ export default {
 </script>
 
 <style scoped>
-
+.badge{
+  background-color: teal !important;
+}
 </style>

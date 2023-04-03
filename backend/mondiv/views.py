@@ -5,12 +5,13 @@ import datetime
 import requests
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.shortcuts import render
 from rest_framework import generics, permissions, mixins
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from mondiv.models import Dividend, Currency, Account, Company, Report
 from mondiv.permissions import IsOwner
@@ -24,6 +25,17 @@ def test(request):
 
 
 ######### Dividend ###############################
+class TotalPayoff(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        return JsonResponse(
+            Dividend.objects.filter(user=self.request.user,
+                                    company__ticker=self.request.query_params.get('ticker')
+                                    ).aggregate(totalPayoff=Sum('payoff'))
+        )
+
+
 def dividend_history(request):
     ticker = request.GET.get('ticker')
     limit = request.GET.get('limit', 40)
@@ -56,6 +68,7 @@ class DividendList(generics.ListCreateAPIView):
     pagination_class = DividendListPagination
 
     def get_queryset(self):
+        print()
         params = self.request.query_params
         # return Dividend.objects.filter(
         #     Q(company__name__icontains=params.get('search')) | Q(company__ticker__icontains=params.get('search')) | Q(

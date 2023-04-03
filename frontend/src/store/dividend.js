@@ -151,5 +151,29 @@ export default {
         }
       }
     },
+    async totalPayoff({commit, getters}, params) {
+      try {
+        const res = await dividend('total_payoff/', {
+          headers: {
+            Authorization: `Token ${getters.token}`
+          },
+          searchParams: {
+            ...params,
+          }
+        }).json()
+        // commit('setDividends', res)
+        return res
+      } catch (error) {
+         if (error.message === 'Request failed with status code 401 Unauthorized') {
+          commit('logout')
+          await router.push('/login')
+        }
+        if (error.name === 'HTTPError') {
+          const errorJson = await error.response.json();
+          commit('setError', errorMessageExtractor(errorJson))
+          throw error
+        }
+      }
+    },
   }
 }
