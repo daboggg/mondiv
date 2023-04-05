@@ -9,6 +9,7 @@
   <div v-else class="container p-3 my-3 bg-body">
     <div class="col text-center my-5 display-6">Информация о компании: {{ company.name }}</div>
     <div class="row">
+<!--      график дивиденды-->
       <div class="col">
         <div class="card row ms-2 me-1">
           <div v-if="loadingChart" class="card-body text-center my-5">
@@ -43,6 +44,7 @@
           </div>
         </div>
       </div>
+<!--      информация по комппании-->
       <div class="col">
         <div class="card row ms-1 me-2">
           <div class="col-4 offset-4 mt-4">
@@ -59,13 +61,14 @@
     </div>
 
     <div v-if="!dividends.count" class="col text-center my-5 display-6">Полученных дивидендов нет</div>
+<!--    таблица полученных дивидендов-->
     <div v-else class="row">
       <div class="col-10 offset-1 mt-5">
         <div class="col text-center my-5 display-6">Полученные дивиденды:</div>
 
-
         <!--    счетчик записей-->
         <span class="h5 ms-3 my-3">Записей: <span class="badge bg-secondary">{{ dividends.count }}</span></span>
+        <!--    общая сумма дивидендов-->
         <span class="h5 ms-5 my-3">Сумма: <span class="badge bg-secondary">{{ totalPayoff }}</span></span>
 
         <!--    таблица-->

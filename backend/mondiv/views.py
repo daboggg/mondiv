@@ -4,6 +4,7 @@ import datetime
 
 import requests
 from django.contrib.auth.decorators import login_required
+from django.db.models.functions import TruncYear
 from django.http import JsonResponse
 from django.db.models import Q, Sum
 from django.shortcuts import render
@@ -25,6 +26,35 @@ def test(request):
 
 
 ######### Dividend ###############################
+class DividendListForChart(APIView):
+    """
+    List all snippets, or create a new snippet.
+    """
+
+    def get(self, request, format=None):
+        params = request.query_params
+        field_value_pairs = [
+            ('user', self.request.user),
+            # ('date_of_receipt__range',
+            #  [params.get('date_start', '2010-01-01'), params.get('date_end', datetime.date.today())]),
+            # ('company__ticker', params.get('ticker')),
+            ('currency__name', params.get('currency'))
+        ]
+        filter_options = {k: v for k, v in field_value_pairs if v}
+        res = Dividend.objects.filter(**filter_options)
+
+        # total_for_each_year
+        if(params.get('type') == 'total_for_each_year'):
+            res = res.annotate(year=(TruncYear('date_of_receipt')))\
+                .values('year')\
+                .annotate(total=Sum('payoff')) \
+                .order_by('year')
+            return JsonResponse({'res': {
+                'years': [r['year'].year for r in res],
+                'total': [r['total'] for r in res],
+            }})
+
+
 class TotalPayoff(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -36,7 +66,7 @@ class TotalPayoff(APIView):
         )
 
 
-def dividend_history(request):
+def dividendHistory(request):
     ticker = request.GET.get('ticker')
     limit = request.GET.get('limit', 40)
     apiKey = os.environ.get("POLYGON_API_KEY") or 'slfhowwfy'
@@ -53,7 +83,7 @@ def dividend_history(request):
         res = res.json()['dividends']['data']
         res = [[r[3] for r in res], [r[2] for r in res]]
 
-    return JsonResponse({'res':res})
+    return JsonResponse({'res': res})
 
 
 class DividendListPagination(PageNumberPagination):
@@ -68,7 +98,6 @@ class DividendList(generics.ListCreateAPIView):
     pagination_class = DividendListPagination
 
     def get_queryset(self):
-        print()
         params = self.request.query_params
         # return Dividend.objects.filter(
         #     Q(company__name__icontains=params.get('search')) | Q(company__ticker__icontains=params.get('search')) | Q(
@@ -78,16 +107,17 @@ class DividendList(generics.ListCreateAPIView):
         # ).order_by('id')
         field_value_pairs = [
             ('user', self.request.user),
-            ('date_of_receipt__range', [params.get('date_start','2010-01-01'), params.get('date_end',datetime.date.today())]),
+            ('date_of_receipt__range',
+             [params.get('date_start', '2010-01-01'), params.get('date_end', datetime.date.today())]),
             ('company__ticker', params.get('ticker'))
         ]
         filter_options = {k: v for k, v in field_value_pairs if v}
         return Dividend.objects.filter(
-            Q(company__name__icontains=params.get('search','')) | Q(company__ticker__icontains=params.get('search','')) | Q(
-                account__name__icontains=params.get('search','')),
+            Q(company__name__icontains=params.get('search', '')) | Q(
+                company__ticker__icontains=params.get('search', '')) | Q(
+                account__name__icontains=params.get('search', '')),
             **filter_options
         )
-
 
     def post(self, request, *args, **kwargs):
         serializer = DividendSerializer(data=request.data)

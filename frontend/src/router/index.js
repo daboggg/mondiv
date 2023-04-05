@@ -10,6 +10,12 @@ const routes = [
     component: () => import('../views/Home')
   },
   {
+    path: '/charts',
+    name: 'charts',
+    meta: {layout: 'main', auth: true},
+    component: () => import('../views/Charts')
+  },
+  {
     path: '/dividends',
     name: 'dividends',
     meta: {layout: 'main', auth: true},

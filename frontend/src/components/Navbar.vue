@@ -33,7 +33,7 @@
               {{ $store.getters.username }}
             </a>
             <ul class="dropdown-menu  dropdown-menu-end dropdown-menu-dark" style="background-color: #00796b">
-              <li><a class="dropdown-item" href="#">Действие</a></li>
+              <li><router-link class="dropdown-item" to="/charts">Графики</router-link></li>
               <li><a class="dropdown-item" href="#">Другое действие</a></li>
               <li>
                 <hr class="dropdown-divider">
