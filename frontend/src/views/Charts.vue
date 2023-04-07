@@ -102,28 +102,56 @@
             </div>
           </div>
           <div class="row mt-4">
-            <div v-if="lastNYearsInUSD" class="col-6">
+            <div v-if="totalForEachTickerInUSD" class="col-6">
               <div class="card">
                 <div class="h3 card-header text-center">
-                  Дивиденды за три последних года в USD
+                  Дивиденды по компаниям в  USD
                 </div>
                 <div class="card-body">
-                  <bar
-                      :options="lastNYearsInUSD.chartOptions"
-                      :data="lastNYearsInUSD.chartData"
+                  <doughnut
+                      :options="totalForEachTickerInUSD.chartOptions"
+                      :data="totalForEachTickerInUSD.chartData"
                   />
                 </div>
               </div>
             </div>
-            <div v-if="lastNYearsInRUB" class="col-6">
+            <div v-if="totalForEachTickerInRUB" class="col-6">
               <div class="card">
                 <div class="h3 card-header text-center">
-                  Дивиденды за три последних года в RUB
+                  Дивиденды по компаниям в  RUB
                 </div>
                 <div class="card-body">
-                  <bar
-                      :options="lastNYearsInRUB.chartOptions"
-                      :data="lastNYearsInRUB.chartData"
+                  <doughnut
+                      :options="totalForEachTickerInRUB.chartOptions"
+                      :data="totalForEachTickerInRUB.chartData"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-4">
+            <div v-if="totalForEachAccountInUSD" class="col-6">
+              <div class="card">
+                <div class="h3 card-header text-center">
+                  Дивиденды на счетах в  USD
+                </div>
+                <div class="card-body">
+                  <polar-area
+                      :options="totalForEachAccountInUSD.chartOptions"
+                      :data="totalForEachAccountInUSD.chartData"
+                  />
+                </div>
+              </div>
+            </div>
+            <div v-if="totalForEachAccountInRUB" class="col-6">
+              <div class="card">
+                <div class="h3 card-header text-center">
+                  Дивиденды на счетах в  RUB
+                </div>
+                <div class="card-body">
+                  <polar-area
+                      :options="totalForEachAccountInRUB.chartOptions"
+                      :data="totalForEachAccountInRUB.chartData"
                   />
                 </div>
               </div>
@@ -141,14 +169,25 @@
 </template>
 
 <script>
-import {Bar} from 'vue-chartjs'
-import {Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, Colors} from 'chart.js';
+import {Bar, Doughnut, PolarArea} from 'vue-chartjs'
+import {
+  Chart as ChartJS,
+  Title,
+  Tooltip,
+  Legend,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Colors,
+  ArcElement,
+  RadialLinearScale,
+} from 'chart.js';
 import groupedChartData from "@/utils/groupedChartData";
 import '@/utils/chartSettings'
 import {backgroundColor, borderColor, threeColors} from "@/utils/chartSettings";
 import moment from "moment";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, Colors)
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, Colors, ArcElement, RadialLinearScale)
 // ChartJS.defaults.backgroundColor = 'rgba(0,121,107,0.64)';
 export default {
   name: "Charts",
@@ -159,7 +198,10 @@ export default {
     lastYearInRUB: null,
     lastNYearsInUSD: null,
     lastNYearsInRUB: null,
-
+    totalForEachTickerInUSD: null,
+    totalForEachTickerInRUB: null,
+    totalForEachAccountInUSD: null,
+    totalForEachAccountInRUB: null,
   }),
   mounted() {
     try {
@@ -276,11 +318,65 @@ export default {
       })
       tmp.chartData.datasets = tmpChartDataRUB
       this.lastNYearsInRUB = tmp
+
+      //totalForEachTickerInUSD
+      res = (await this.$store.dispatch('dividendsForChart', {
+        currency: 'USD',
+        type: 'total_for_each_ticker'
+      }))
+      tmp = JSON.parse(JSON.stringify(groupedChartData));
+      tmp.chartData.labels = res.companyName
+      tmp.chartData.datasets = [{
+        data: res.total,
+        label: 'Всего в USD',
+      }]
+      this.totalForEachTickerInUSD = tmp
+
+      //totalForEachTickerInRUB
+      res = (await this.$store.dispatch('dividendsForChart', {
+        currency: 'RUB',
+        type: 'total_for_each_ticker'
+      }))
+      tmp = JSON.parse(JSON.stringify(groupedChartData));
+      tmp.chartData.labels = res.companyName
+      tmp.chartData.datasets = [{
+        data: res.total,
+        label: 'Всего в RUB',
+      }]
+      this.totalForEachTickerInRUB = tmp
+
+      //totalForEachAccountInUSD
+      res = (await this.$store.dispatch('dividendsForChart', {
+        currency: 'USD',
+        type: 'total_for_each_account'
+      }))
+      tmp = JSON.parse(JSON.stringify(groupedChartData));
+      tmp.chartOptions.plugins.legend.display = true
+      tmp.chartData.labels = res.accountName
+      tmp.chartData.datasets = [{
+        data: res.total,
+        label: 'Всего в USD',
+      }]
+      this.totalForEachAccountInUSD = tmp
+
+      //totalForEachAccountInRUB
+      res = (await this.$store.dispatch('dividendsForChart', {
+        currency: 'RUB',
+        type: 'total_for_each_account'
+      }))
+      tmp = JSON.parse(JSON.stringify(groupedChartData));
+      tmp.chartOptions.plugins.legend.display = true
+      tmp.chartData.labels = res.accountName
+      tmp.chartData.datasets = [{
+        data: res.total,
+        label: 'Всего в RUB',
+      }]
+      this.totalForEachAccountInRUB = tmp
     }
 
   },
   computed: {},
-  components: {Bar}
+  components: { Bar, Doughnut, PolarArea }
 }
 </script>
 

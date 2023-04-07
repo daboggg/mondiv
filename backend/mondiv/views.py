@@ -41,9 +41,9 @@ class DividendListForChart(APIView):
         res = Dividend.objects.filter(**filter_options)
 
         # total_for_each_year
-        if(params.get('type') == 'total_for_each_year'):
-            res = res.annotate(year=(TruncYear('date_of_receipt')))\
-                .values('year')\
+        if (params.get('type') == 'total_for_each_year'):
+            res = res.annotate(year=(TruncYear('date_of_receipt'))) \
+                .values('year') \
                 .annotate(total=Sum('payoff')) \
                 .order_by('year')
             return JsonResponse({'res': {
@@ -52,10 +52,10 @@ class DividendListForChart(APIView):
             }})
 
         # last_year
-        elif(params.get('type') == 'last_year'):
+        elif (params.get('type') == 'last_year'):
             res = res.annotate(year=TruncYear('date_of_receipt'),
                                month=TruncMonth('date_of_receipt')) \
-                .values('year', 'month')\
+                .values('year', 'month') \
                 .annotate(total=Sum('payoff')) \
                 .order_by('year')
             return JsonResponse({'res': {
@@ -74,13 +74,30 @@ class DividendListForChart(APIView):
             result = {'month': rus_months, 'years': {}}
 
             for r in res:
-                result['years'][r['year'].year] = [0,0,0,0,0,0,0,0,0,0,0,0]
+                result['years'][r['year'].year] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
             for r in res:
                 result['years'][r['year'].year][r['month'].month - 1] = r['total']
 
             return JsonResponse(result)
 
+        # total_for_each_ticker
+        elif (params.get('type') == 'total_for_each_ticker'):
+            res = res.values('company__name').annotate(total=Sum('payoff'))
+
+            return JsonResponse({
+                'companyName': [r['company__name'] for r in res],
+                'total': [r['total'] for r in res]
+            })
+
+        # total_for_each_account
+        elif (params.get('type') == 'total_for_each_account'):
+            res = res.values('account__name').annotate(total=Sum('payoff'))
+
+            return JsonResponse({
+                'accountName': [r['account__name'] for r in res],
+                'total': [r['total'] for r in res]
+            })
 
 
 class TotalPayoff(APIView):
