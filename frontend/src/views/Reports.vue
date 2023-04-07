@@ -147,6 +147,8 @@
 
 <script>
 
+import moment from "moment";
+
 export default {
   name: "Dividends",
   data: () => ({
@@ -179,7 +181,7 @@ export default {
           page_size: this.qParams.page_size,
           // приведение даты к виду '2010-01-01' (.toISOString().split('T')[0])
           date_start: this.qParams.date_start ? this.qParams.date_start : '2010-01-01',
-          date_end: this.qParams.date_end ? this.qParams.date_end : new Date().toISOString().split('T')[0]
+          date_end: this.qParams.date_end ? this.qParams.date_end : moment(new Date).format('YYYY-MM-DD')
         })
         this.loading = false
       } catch (e) {

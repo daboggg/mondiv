@@ -16,3 +16,13 @@ def get_month_list():
         ps.append(qw.strftime("%B"))
         count = count + 1
     return ps
+
+
+rus_months = ['январь','февраль','март','апрель','май',
+        'июнь','июль','август','сентябрь','октябрь',
+        'ноябрь','декабрь',
+    ]
+
+
+def get_rus_month(m):
+    return rus_months[m-1]

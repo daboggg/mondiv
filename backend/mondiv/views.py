@@ -4,7 +4,7 @@ import datetime
 
 import requests
 from django.contrib.auth.decorators import login_required
-from django.db.models.functions import TruncYear
+from django.db.models.functions import TruncYear, TruncMonth
 from django.http import JsonResponse
 from django.db.models import Q, Sum
 from django.shortcuts import render
@@ -18,7 +18,7 @@ from mondiv.models import Dividend, Currency, Account, Company, Report
 from mondiv.permissions import IsOwner
 from mondiv.serializers import DividendListSerializer, CurrencySerializer, AccountSerializer, DividendSerializer, \
     CompanyListSerializer, ReportListSerializer, ReportSerializer
-from mondiv.utils import client
+from mondiv.utils import client, get_rus_month, rus_months
 
 
 def test(request):
@@ -27,16 +27,13 @@ def test(request):
 
 ######### Dividend ###############################
 class DividendListForChart(APIView):
-    """
-    List all snippets, or create a new snippet.
-    """
 
     def get(self, request, format=None):
         params = request.query_params
         field_value_pairs = [
             ('user', self.request.user),
-            # ('date_of_receipt__range',
-            #  [params.get('date_start', '2010-01-01'), params.get('date_end', datetime.date.today())]),
+            ('date_of_receipt__range',
+             [params.get('date_start', '2010-01-01'), params.get('date_end', datetime.date.today())]),
             # ('company__ticker', params.get('ticker')),
             ('currency__name', params.get('currency'))
         ]
@@ -53,6 +50,37 @@ class DividendListForChart(APIView):
                 'years': [r['year'].year for r in res],
                 'total': [r['total'] for r in res],
             }})
+
+        # last_year
+        elif(params.get('type') == 'last_year'):
+            res = res.annotate(year=TruncYear('date_of_receipt'),
+                               month=TruncMonth('date_of_receipt')) \
+                .values('year', 'month')\
+                .annotate(total=Sum('payoff')) \
+                .order_by('year')
+            return JsonResponse({'res': {
+                'month': [get_rus_month(r['month'].month) for r in res],
+                'total': [r['total'] for r in res],
+            }})
+
+        # last_n_years
+        elif (params.get('type') == 'last_n_years'):
+            res = res.annotate(year=TruncYear('date_of_receipt'),
+                               month=TruncMonth('date_of_receipt')) \
+                .values('year', 'month') \
+                .annotate(total=Sum('payoff')) \
+                .order_by('year')
+
+            result = {'month': rus_months, 'years': {}}
+
+            for r in res:
+                result['years'][r['year'].year] = [0,0,0,0,0,0,0,0,0,0,0,0]
+
+            for r in res:
+                result['years'][r['year'].year][r['month'].month - 1] = r['total']
+
+            return JsonResponse(result)
+
 
 
 class TotalPayoff(APIView):

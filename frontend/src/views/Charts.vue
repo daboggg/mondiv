@@ -18,84 +18,112 @@
         <!--        дивиденды-->
         <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
           <div class="row mt-4">
-            <div class="col-6">
+            <div v-if="totalForEachYearInUSD" class="col-6">
               <div class="card">
                 <div class="h3 card-header text-center">
                   Дивиденды в USD
                 </div>
                 <div class="card-body">
                   <bar
-                      :options="chartOptions"
-                      :data="chartData"
+                      :options="totalForEachYearInUSD.chartOptions"
+                      :data="totalForEachYearInUSD.chartData"
                   />
                 </div>
               </div>
             </div>
-            <div class="col-6">
+            <div v-if="totalForEachYearInRUB" class="col-6">
               <div class="card">
                 <div class="h3 card-header text-center">
                   Дивиденды в RUB
                 </div>
                 <div class="card-body">
                   <bar
-                      :options="chartOptions"
-                      :data="chartData"
+                      :options="totalForEachYearInRUB.chartOptions"
+                      :data="totalForEachYearInRUB.chartData"
                   />
                 </div>
               </div>
             </div>
           </div>
           <div class="row mt-4">
-            <div class="col-6">
+            <div v-if="lastYearInUSD" class="col-6">
               <div class="card">
                 <div class="h3 card-header text-center">
-                  Дивиденды в USD
+                  Дивиденды за последний год в USD
                 </div>
                 <div class="card-body">
                   <bar
-                      :options="chartOptions"
-                      :data="chartData"
+                      :options="lastYearInUSD.chartOptions"
+                      :data="lastYearInUSD.chartData"
                   />
                 </div>
               </div>
             </div>
-            <div class="col-6">
+            <div v-if="lastYearInRUB" class="col-6">
               <div class="card">
                 <div class="h3 card-header text-center">
-                  Дивиденды в RUB
+                  Дивиденды за последний год в RUB
                 </div>
                 <div class="card-body">
                   <bar
-                      :options="chartOptions"
-                      :data="chartData"
+                      :options="lastYearInRUB.chartOptions"
+                      :data="lastYearInRUB.chartData"
                   />
                 </div>
               </div>
             </div>
           </div>
           <div class="row mt-4">
-            <div class="col-6">
+            <div v-if="lastNYearsInUSD" class="col-6">
               <div class="card">
                 <div class="h3 card-header text-center">
-                  Дивиденды в USD
+                  Дивиденды за три последних года в USD
                 </div>
                 <div class="card-body">
                   <bar
-                      :options="chartOptions"
-                      :data="chartData"
+                      :options="lastNYearsInUSD.chartOptions"
+                      :data="lastNYearsInUSD.chartData"
                   />
                 </div>
               </div>
             </div>
-            <div class="col-6">
+            <div v-if="lastNYearsInRUB" class="col-6">
               <div class="card">
                 <div class="h3 card-header text-center">
-                  Дивиденды в RUB
+                  Дивиденды за три последних года в RUB
                 </div>
                 <div class="card-body">
                   <bar
-                      :options="chartOptions"
-                      :data="chartData"
+                      :options="lastNYearsInRUB.chartOptions"
+                      :data="lastNYearsInRUB.chartData"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-4">
+            <div v-if="lastNYearsInUSD" class="col-6">
+              <div class="card">
+                <div class="h3 card-header text-center">
+                  Дивиденды за три последних года в USD
+                </div>
+                <div class="card-body">
+                  <bar
+                      :options="lastNYearsInUSD.chartOptions"
+                      :data="lastNYearsInUSD.chartData"
+                  />
+                </div>
+              </div>
+            </div>
+            <div v-if="lastNYearsInRUB" class="col-6">
+              <div class="card">
+                <div class="h3 card-header text-center">
+                  Дивиденды за три последних года в RUB
+                </div>
+                <div class="card-body">
+                  <bar
+                      :options="lastNYearsInRUB.chartOptions"
+                      :data="lastNYearsInRUB.chartData"
                   />
                 </div>
               </div>
@@ -104,62 +132,154 @@
         </div>
         <!--        отчеты-->
         <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
-          gGGGGGGGGGGGGGGGG
         </div>
       </div>
 
     </div>
+    {{ totalForEachYearInUSD }}
   </div>
 </template>
 
 <script>
 import {Bar} from 'vue-chartjs'
-import {Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale} from 'chart.js';
+import {Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, Colors} from 'chart.js';
+import groupedChartData from "@/utils/groupedChartData";
+import '@/utils/chartSettings'
+import {backgroundColor, borderColor, threeColors} from "@/utils/chartSettings";
+import moment from "moment";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
-ChartJS.defaults.backgroundColor = 'rgba(0,121,107,0.64)';
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, Colors)
+// ChartJS.defaults.backgroundColor = 'rgba(0,121,107,0.64)';
 export default {
   name: "Charts",
-  data: ()=>({
-    chartData: {
-      labels: ['январь','февраль','март','апрель','май'],
-      datasets: [{data:[9,12,21,13,19]}]
-    },
-    chartOptions: {
-      maintainAspectRatio: true,
-      aspectRatio: 1,
-      layout: {
-        padding: 5
-      },
-      plugins: {
-        legend: {
-          display: false,
-        },
-        tooltip: {
-          titleFont: {
-            size: 20
-          }
-        },
-        title: {
-          font: {
-            size: 30
-          },
-          display: true,
-          text: ''
-        }
-      }
-    },
+  data: () => ({
+    totalForEachYearInUSD: null,
+    totalForEachYearInRUB: null,
+    lastYearInUSD: null,
+    lastYearInRUB: null,
+    lastNYearsInUSD: null,
+    lastNYearsInRUB: null,
+
   }),
-  async mounted() {
-    const res = (await this.$store.dispatch('dividendsForChart', {
-      currency: 'RUB',
-      type: 'total_for_each_year'
-    })).res
-    this.chartData = {
-      labels: res.years,
-      datasets: [{data:res.total}]
+  mounted() {
+    try {
+      this.getDataForCharts()
+    } catch (e) {
+      console.log(e)
     }
   },
+  methods: {
+    async getDataForCharts() {
+
+      let res, tmp;
+
+      //totalForEachYearInUSD
+      res = (await this.$store.dispatch('dividendsForChart', {
+        currency: 'USD',
+        type: 'total_for_each_year'
+      })).res
+      tmp = JSON.parse(JSON.stringify(groupedChartData));
+      tmp.chartData.labels = res.years
+      tmp.chartData.datasets = [{
+        data: res.total,
+        label: 'Дивиденды в USD',
+        backgroundColor: backgroundColor,
+        borderColor: borderColor,
+        borderWidth: 2
+      }]
+      this.totalForEachYearInUSD = tmp
+
+      //totalForEachYearInRUB
+      res = (await this.$store.dispatch('dividendsForChart', {
+        currency: 'RUB',
+        type: 'total_for_each_year'
+      })).res
+      tmp = JSON.parse(JSON.stringify(groupedChartData));
+      tmp.chartData.labels = res.years
+      tmp.chartData.datasets = [{
+        data: res.total,
+        label: 'Дивиденды в RUB',
+        backgroundColor: backgroundColor,
+        borderColor: borderColor,
+        borderWidth: 2
+      }]
+      this.totalForEachYearInRUB = tmp
+
+      //lastYearInUSD
+      res = (await this.$store.dispatch('dividendsForChart', {
+        date_start: moment().subtract("years", 1).format('YYYY-MM-DD'),
+        currency: 'USD',
+        type: 'last_year'
+      })).res
+      tmp = JSON.parse(JSON.stringify(groupedChartData));
+      tmp.chartData.labels = res.month
+      tmp.chartData.datasets = [{
+        data: res.total,
+        label: 'Дивиденды в USD',
+        backgroundColor: 'rgba(0,121,107,0.3)',
+        borderColor: 'rgba(0,121,107,0.6)',
+        borderWidth:2
+      }]
+      this.lastYearInUSD = tmp
+
+      //lastYearInRUB
+      res = (await this.$store.dispatch('dividendsForChart', {
+        date_start: moment().subtract("years", 1).format('YYYY-MM-DD'),
+        currency: 'RUB',
+        type: 'last_year'
+      })).res
+      tmp = JSON.parse(JSON.stringify(groupedChartData));
+      tmp.chartData.labels = res.month
+      tmp.chartData.datasets = [{
+        data: res.total,
+        label: 'Дивиденды в RUB',
+        backgroundColor: 'rgba(0,121,107,0.3)',
+        borderColor: 'rgba(0,121,107,0.6)',
+        borderWidth:2
+      }]
+      this.lastYearInRUB = tmp
+
+      //lastNYearsInUSD
+      res = (await this.$store.dispatch('dividendsForChart', {
+        date_start: moment().subtract("years", 2).year() + '-01-01',
+        currency: 'USD',
+        type: 'last_n_years'
+      }))
+      tmp = JSON.parse(JSON.stringify(groupedChartData));
+      tmp.chartData.labels = res.month
+      tmp.chartOptions.plugins.legend.display = true
+      const tmpChartDataUSD = []
+      Object.keys(res.years).forEach(a => {
+        tmpChartDataUSD.push({
+          data: res.years[a],
+          label: `Дивиденды за ${a} год в USD`,
+        })
+      })
+      tmp.chartData.datasets = tmpChartDataUSD
+      this.lastNYearsInUSD = tmp
+
+      //lastNYearsInUSD
+      res = (await this.$store.dispatch('dividendsForChart', {
+        date_start: moment().subtract("years", 2).year() + '-01-01',
+        currency: 'RUB',
+        type: 'last_n_years'
+      }))
+      tmp = JSON.parse(JSON.stringify(groupedChartData));
+      tmp.chartData.labels = res.month
+      tmp.chartOptions.plugins.legend.display = true
+      const tmpChartDataRUB = []
+      Object.keys(res.years).forEach(a => {
+        tmpChartDataRUB.push({
+          data: res.years[a],
+          label: `Дивиденды за ${a} год в RUB`,
+        })
+      })
+      tmp.chartData.datasets = tmpChartDataRUB
+      this.lastNYearsInRUB = tmp
+    }
+
+  },
+  computed: {},
   components: {Bar}
 }
 </script>
