@@ -16,6 +16,12 @@ const routes = [
     component: () => import('../views/Charts')
   },
   {
+    path: '/statistics',
+    name: 'statistics',
+    meta: {layout: 'main', auth: true},
+    component: () => import('../views/Statistics')
+  },
+  {
     path: '/dividends',
     name: 'dividends',
     meta: {layout: 'main', auth: true},

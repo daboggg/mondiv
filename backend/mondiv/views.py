@@ -99,6 +99,21 @@ class DividendListForChart(APIView):
                 'total': [r['total'] for r in res]
             })
 
+        # statistics
+        elif (params.get('type') == 'statistics'):
+            res = res.values('company__name', 'payoff').order_by('payoff')
+            min_payment = res.first()
+            max_payment = res.last()
+            total = res.aggregate(total=Sum('payoff'))['total']
+            total_payments = res.count()
+
+            return JsonResponse({
+                'minPayment': min_payment,
+                'maxPayment': max_payment,
+                'totalPayments': total_payments,
+                'total': round(total,2)
+            })
+
 
 class TotalPayoff(APIView):
     permission_classes = [IsAuthenticated]
