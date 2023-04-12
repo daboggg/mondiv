@@ -1,6 +1,8 @@
 import json
 import os
 import datetime
+import calendar
+from datetime import timedelta
 
 import requests
 from django.contrib.auth.decorators import login_required
@@ -12,6 +14,7 @@ from rest_framework import generics, permissions, mixins
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.status import HTTP_409_CONFLICT
 from rest_framework.views import APIView
 
 from mondiv.models import Dividend, Currency, Account, Company, Report
@@ -41,7 +44,7 @@ class DividendListForChart(APIView):
         res = Dividend.objects.filter(**filter_options)
 
         # total_for_each_year
-        if (params.get('type') == 'total_for_each_year'):
+        if params.get('type') == 'total_for_each_year':
             res = res.annotate(year=(TruncYear('date_of_receipt'))) \
                 .values('year') \
                 .annotate(total=Sum('payoff')) \
@@ -52,7 +55,7 @@ class DividendListForChart(APIView):
             }})
 
         # last_year
-        elif (params.get('type') == 'last_year'):
+        elif params.get('type') == 'last_year':
             res = res.annotate(year=TruncYear('date_of_receipt'),
                                month=TruncMonth('date_of_receipt')) \
                 .values('year', 'month') \
@@ -64,7 +67,7 @@ class DividendListForChart(APIView):
             }})
 
         # last_n_years
-        elif (params.get('type') == 'last_n_years'):
+        elif params.get('type') == 'last_n_years':
             res = res.annotate(year=TruncYear('date_of_receipt'),
                                month=TruncMonth('date_of_receipt')) \
                 .values('year', 'month') \
@@ -82,7 +85,7 @@ class DividendListForChart(APIView):
             return JsonResponse(result)
 
         # total_for_each_ticker
-        elif (params.get('type') == 'total_for_each_ticker'):
+        elif params.get('type') == 'total_for_each_ticker':
             res = res.values('company__name').annotate(total=Sum('payoff'))
 
             return JsonResponse({
@@ -91,7 +94,7 @@ class DividendListForChart(APIView):
             })
 
         # total_for_each_account
-        elif (params.get('type') == 'total_for_each_account'):
+        elif params.get('type') == 'total_for_each_account':
             res = res.values('account__name').annotate(total=Sum('payoff'))
 
             return JsonResponse({
@@ -100,7 +103,7 @@ class DividendListForChart(APIView):
             })
 
         # statistics
-        elif (params.get('type') == 'statistics'):
+        elif params.get('type') == 'statistics':
             res = res.values('company__name', 'payoff').order_by('payoff')
             min_payment = res.first()
             max_payment = res.last()
@@ -111,7 +114,7 @@ class DividendListForChart(APIView):
                 'minPayment': min_payment,
                 'maxPayment': max_payment,
                 'totalPayments': total_payments,
-                'total': round(total,2)
+                'total': round(total, 2)
             })
 
 
@@ -215,14 +218,6 @@ class AccountList(mixins.ListModelMixin, generics.GenericAPIView):
 
 
 ######### Company ###############################
-# class CompanyList(mixins.ListModelMixin, generics.GenericAPIView):
-#     queryset = Company.objects.all()
-#     serializer_class = CompanyListSerializer
-#
-#     def get(self, request, *args, **kwargs):
-#         return self.list(request, *args, **kwargs)
-
-
 class CompanyListPagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = 'page_size'
@@ -268,7 +263,76 @@ class CompanyDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CompanyListSerializer
 
 
-######### Company ###############################
+######### Report ###############################
+class ReportListForChart(APIView):
+
+    def get(self, request, format=None):
+        params = request.query_params
+        field_value_pairs = [
+            ('user', self.request.user),
+            ('report_date__range',
+             [params.get('date_start', '2010-01-01'), params.get('date_end', datetime.date.today())]),
+            # ('company__ticker', params.get('ticker')),
+            ('currency__name', params.get('currency'))
+        ]
+        filter_options = {k: v for k, v in field_value_pairs if v}
+        reports = Report.objects.filter(**filter_options)
+
+        # reports_for_each_company
+        if params.get('type') == 'reports_for_each_company':
+
+            result = {'data': {}}
+
+            start = datetime.datetime.strptime('2022-12-01', '%Y-%m-%d').date()
+            end = datetime.date.today()
+            labels = []
+
+            while start < end:
+                labels.append(f'{get_rus_month(start.month)}-{start.year}')
+                days_in_month = calendar.monthrange(start.year, start.month)[1]
+                start += timedelta(days=days_in_month)
+            result['labels'] = labels
+
+            for account in Account.objects.filter(user=self.request.user):
+                reportsByAccount = reports.filter(account=account) \
+                    .order_by('report_date') \
+                    .values('amount') \
+                    .annotate(year=TruncYear('report_date'), month=TruncMonth('report_date'))
+
+                data = {
+                    f'{get_rus_month(r["month"].month)}-{r["year"].year}': r['amount']
+                    for r in reportsByAccount
+                }
+
+                result['data'][account.name] = data
+            return JsonResponse(result)
+
+        # general_report
+        elif params.get('type') == 'general_report':
+
+            result = {'data': {}}
+
+            start = datetime.datetime.strptime('2022-12-01', '%Y-%m-%d').date()
+            end = datetime.date.today()
+            labels = []
+
+            while start < end:
+                labels.append(f'{get_rus_month(start.month)}-{start.year}')
+                days_in_month = calendar.monthrange(start.year, start.month)[1]
+                start += timedelta(days=days_in_month)
+            result['labels'] = labels
+
+            res = reports.annotate() \
+                .annotate(month=TruncMonth('report_date')) \
+                .order_by('month')\
+                .values('month') \
+                .annotate(total=Sum('amount'))
+
+            res = {f'{get_rus_month(r["month"].month)}-{r["month"].year}': r['total'] for r in res}
+            result['data'] = res
+            return JsonResponse(result)
+
+
 class ReportListPagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = 'page_size'
@@ -288,11 +352,19 @@ class ReportList(generics.ListCreateAPIView):
         ).order_by('id')
 
     def post(self, request, *args, **kwargs):
-        serializer = ReportSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save(user=self.request.user)
+        data = request.data
+        if Report.objects.filter(user=self.request.user,
+                                 report_date=data['report_date'],
+                                 currency=data['currency'],
+                                 account=data['account']).exists():
+            return Response({'message': 'Этот отчет уже существует'}, status=HTTP_409_CONFLICT)
 
-        return Response({'report': serializer.data})
+        else:
+            serializer = ReportSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(user=self.request.user)
+
+            return Response({'report': serializer.data})
 
 
 class ReportDetail(generics.RetrieveUpdateDestroyAPIView):

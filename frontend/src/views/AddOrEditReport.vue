@@ -12,14 +12,20 @@
               <div class="mb-3">
                 <i class="bi-calendar3 fs-5 me-2"></i>
                 <label for="chooseDate" class="form-label">Дата отчета</label>
-                <datepicker v-model="datepicker.date"
-                            id="chooseDate"
-                            :inputFormat="datepicker.inputFormat"
-                            :locale="datepicker.ru"
-                            :upperLimit="datepicker.upperLimit"
-                            :typeable="datepicker.typeable"
-                            class="form-control"
-                />
+<!--                <datepicker v-model="datepicker.date"-->
+<!--                            id="chooseDate"-->
+<!--                            :inputFormat="datepicker.inputFormat"-->
+<!--                            :locale="datepicker.ru"-->
+<!--                            :upperLimit="datepicker.upperLimit"-->
+<!--                            :typeable="datepicker.typeable"-->
+<!--                            class="form-control"-->
+<!--                />-->
+                <input v-model="datepicker.date"
+                       type="month"
+                       id="chooseDate"
+                       class="form-control"
+                       :max="moment().format('YYYY-MM')"
+                >
                 <div
                     class="invalid form-text"
                     v-for="e in v$.datepicker.date.$errors"
@@ -107,6 +113,7 @@ export default {
     }
   },
   data: () => ({
+    moment: moment,
     amount: '',
     account: '',
     currency: '',
@@ -144,7 +151,8 @@ export default {
         this.account = this.editableReport.account
         this.currency = this.editableReport.currency
         this.amount = this.editableReport.amount
-        this.datepicker.date = new Date(this.editableReport.report_date)
+        this.datepicker.date = moment(this.editableReport.report_date).format('YYYY-MM')
+        console.log(this.datepicker.date)
       }
       await this.$store.dispatch('fetchAccounts')
       await this.$store.dispatch('fetchCurrencies')

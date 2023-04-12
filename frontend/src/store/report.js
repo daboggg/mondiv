@@ -117,6 +117,28 @@ export default {
           throw error
         }
       }
-    }
+    },
+    async reportsForChart({commit, getters}, params) {
+      try {
+        return  await report('reports_for_chart/', {
+          headers: {
+            Authorization: `Token ${getters.token}`
+          },
+          searchParams: {
+            ...params,
+          }
+        }).json()
+      } catch (error) {
+         if (error.message === 'Request failed with status code 401 Unauthorized') {
+          commit('logout')
+          await router.push('/login')
+        }
+        if (error.name === 'HTTPError') {
+          const errorJson = await error.response.json();
+          commit('setError', errorMessageExtractor(errorJson))
+          throw error
+        }
+      }
+    },
   }
 }

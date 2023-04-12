@@ -105,7 +105,7 @@
             <div v-if="totalForEachTickerInUSD" class="col-6">
               <div class="card">
                 <div class="h3 card-header text-center">
-                  Дивиденды по компаниям в  USD
+                  Дивиденды по компаниям в USD
                 </div>
                 <div class="card-body">
                   <doughnut
@@ -118,7 +118,7 @@
             <div v-if="totalForEachTickerInRUB" class="col-6">
               <div class="card">
                 <div class="h3 card-header text-center">
-                  Дивиденды по компаниям в  RUB
+                  Дивиденды по компаниям в RUB
                 </div>
                 <div class="card-body">
                   <doughnut
@@ -133,7 +133,7 @@
             <div v-if="totalForEachAccountInUSD" class="col-6">
               <div class="card">
                 <div class="h3 card-header text-center">
-                  Дивиденды на счетах в  USD
+                  Дивиденды на счетах в USD
                 </div>
                 <div class="card-body">
                   <polar-area
@@ -146,7 +146,7 @@
             <div v-if="totalForEachAccountInRUB" class="col-6">
               <div class="card">
                 <div class="h3 card-header text-center">
-                  Дивиденды на счетах в  RUB
+                  Дивиденды на счетах в RUB
                 </div>
                 <div class="card-body">
                   <polar-area
@@ -160,16 +160,75 @@
         </div>
         <!--        отчеты-->
         <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+          <div class="row mt-4">
+            <div v-if="reportsForEachCompanyInUSD" class="col">
+              <div class="card">
+                <div class="h3 card-header text-center">
+                  Отчеты в USD
+                </div>
+                <div class="card-body">
+                  <Line
+                      :options="reportsForEachCompanyInUSD.chartOptions"
+                      :data="reportsForEachCompanyInUSD.chartData"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-4">
+            <div v-if="reportsForEachCompanyInRUB" class="col">
+              <div class="card">
+                <div class="h3 card-header text-center">
+                  Отчеты в RUB
+                </div>
+                <div class="card-body">
+                  <Line
+                      :options="reportsForEachCompanyInRUB.chartOptions"
+                      :data="reportsForEachCompanyInRUB.chartData"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-4">
+            <div v-if="generalReportInUSD" class="col">
+              <div class="card">
+                <div class="h3 card-header text-center">
+                  Отчет в USD
+                </div>
+                <div class="card-body">
+                  <Line
+                      :options="generalReportInUSD.chartOptions"
+                      :data="generalReportInUSD.chartData"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-4">
+            <div v-if="generalReportInRUB" class="col">
+              <div class="card">
+                <div class="h3 card-header text-center">
+                  Отчет в RUB
+                </div>
+                <div class="card-body">
+                  <Line
+                      :options="generalReportInRUB.chartOptions"
+                      :data="generalReportInRUB.chartData"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
     </div>
-    {{ totalForEachYearInUSD }}
   </div>
 </template>
 
 <script>
-import {Bar, Doughnut, PolarArea} from 'vue-chartjs'
+import {Bar, Doughnut, PolarArea, Line} from 'vue-chartjs'
 import {
   Chart as ChartJS,
   Title,
@@ -181,13 +240,15 @@ import {
   Colors,
   ArcElement,
   RadialLinearScale,
+  PointElement,
+  LineElement,
 } from 'chart.js';
 import groupedChartData from "@/utils/groupedChartData";
 import '@/utils/chartSettings'
 import {backgroundColor, borderColor, threeColors} from "@/utils/chartSettings";
 import moment from "moment";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, Colors, ArcElement, RadialLinearScale)
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, Colors, ArcElement, RadialLinearScale)
 // ChartJS.defaults.backgroundColor = 'rgba(0,121,107,0.64)';
 export default {
   name: "Charts",
@@ -202,16 +263,21 @@ export default {
     totalForEachTickerInRUB: null,
     totalForEachAccountInUSD: null,
     totalForEachAccountInRUB: null,
+    reportsForEachCompanyInUSD: null,
+    reportsForEachCompanyInRUB: null,
+    generalReportInUSD: null,
+    generalReportInRUB: null,
   }),
   mounted() {
     try {
-      this.getDataForCharts()
+      this.getDataForDividendCharts()
+      this.getDataForReportCharts()
     } catch (e) {
       console.log(e)
     }
   },
   methods: {
-    async getDataForCharts() {
+    async getDataForDividendCharts() {
 
       let res, tmp;
 
@@ -260,7 +326,7 @@ export default {
         label: 'Дивиденды в USD',
         backgroundColor: 'rgba(0,121,107,0.3)',
         borderColor: 'rgba(0,121,107,0.6)',
-        borderWidth:2
+        borderWidth: 2
       }]
       this.lastYearInUSD = tmp
 
@@ -277,7 +343,7 @@ export default {
         label: 'Дивиденды в RUB',
         backgroundColor: 'rgba(0,121,107,0.3)',
         borderColor: 'rgba(0,121,107,0.6)',
-        borderWidth:2
+        borderWidth: 2
       }]
       this.lastYearInRUB = tmp
 
@@ -372,11 +438,116 @@ export default {
         label: 'Всего в RUB',
       }]
       this.totalForEachAccountInRUB = tmp
+    },
+    async getDataForReportCharts() {
+      let data, tmp, tmpDatasets;
+
+      //reportsForEachCompanyInUSD
+      data = (await this.$store.dispatch('reportsForChart', {
+        currency: 'USD',
+        type: 'reports_for_each_company'
+      }))
+
+      tmp = JSON.parse(JSON.stringify(groupedChartData))
+      tmp.chartOptions.responsive = true
+      tmp.chartOptions.maintainAspectRatio = false
+      tmp.chartOptions.plugins.legend.display = true
+      tmp.chartData.labels = data.labels
+      tmpDatasets = []
+      Object.keys(data.data).forEach(acc => {
+        tmpDatasets.push({
+          data: data.data[acc],
+          label: acc,
+          pointStyle: 'rectRounded',
+          pointRadius: 10,
+          pointHoverRadius: 12,
+          pointBorderWidth: 0,
+          borderWidth: 7,
+          tension: 0.3
+        })
+      })
+      tmp.chartData.datasets = tmpDatasets
+
+      this.reportsForEachCompanyInUSD = tmp
+
+      //reportsForEachCompanyInRUB
+      data = (await this.$store.dispatch('reportsForChart', {
+        currency: 'RUB',
+        type: 'reports_for_each_company'
+      }))
+
+      tmp = JSON.parse(JSON.stringify(groupedChartData))
+      tmp.chartOptions.responsive = true
+      tmp.chartOptions.maintainAspectRatio = false
+      tmp.chartOptions.plugins.legend.display = true
+      tmp.chartData.labels = data.labels
+      tmpDatasets = []
+      Object.keys(data.data).forEach(acc => {
+        tmpDatasets.push({
+          data: data.data[acc],
+          label: acc,
+          pointStyle: 'rectRounded',
+          pointRadius: 10,
+          pointHoverRadius: 12,
+          pointBorderWidth: 0,
+          borderWidth: 7,
+          tension: 0.3
+        })
+      })
+      tmp.chartData.datasets = tmpDatasets
+      // console.log(tmp)
+      this.reportsForEachCompanyInRUB = tmp
+
+      //generalReportInUSD
+      data = (await this.$store.dispatch('reportsForChart', {
+        currency: 'USD',
+        type: 'general_report'
+      }))
+
+      tmp = JSON.parse(JSON.stringify(groupedChartData))
+      tmp.chartOptions.responsive = true
+      tmp.chartOptions.maintainAspectRatio = false
+      tmp.chartData.labels = data.labels
+      tmp.chartData.datasets = [{
+        data: data.data,
+        label: 'USD',
+        pointStyle: 'rectRounded',
+        pointRadius: 10,
+        pointHoverRadius: 12,
+        pointBorderWidth: 0,
+        borderWidth: 7,
+        tension: 0.3
+      }]
+
+      this.generalReportInUSD = tmp
+
+      //generalReportInRUB
+      data = (await this.$store.dispatch('reportsForChart', {
+        currency: 'RUB',
+        type: 'general_report'
+      }))
+
+      tmp = JSON.parse(JSON.stringify(groupedChartData))
+      tmp.chartOptions.responsive = true
+      tmp.chartOptions.maintainAspectRatio = false
+      tmp.chartData.labels = data.labels
+      tmp.chartData.datasets = [{
+        data: data.data,
+        label: 'RUB',
+        pointStyle: 'rectRounded',
+        pointRadius: 10,
+        pointHoverRadius: 12,
+        pointBorderWidth: 0,
+        borderWidth: 7,
+        tension: 0.3
+      }]
+
+      this.generalReportInRUB = tmp
     }
 
   },
   computed: {},
-  components: { Bar, Doughnut, PolarArea }
+  components: {Bar, Doughnut, PolarArea, Line}
 }
 </script>
 

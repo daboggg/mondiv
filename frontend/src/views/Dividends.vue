@@ -43,7 +43,7 @@
         <span class="input-group-text">С</span>
         <input v-model="qParams.date_start" type="date"
                class="form-control" min="2019-01-01"
-               :max="new Date().toLocaleDateString('en-CA')"
+               :max="moment().format('YYYY-MM-DD')"
                style="font-weight: bold"
         />
         <button type="button" @click="qParams.date_start = ''; fetchDividends()" class="input-group-btn btn btn-light ms-1"><i
@@ -52,7 +52,7 @@
         <span class="input-group-text ms-3">По</span>
         <input v-model="qParams.date_end" type="date"
                class="form-control" min="2019-01-01"
-               :max="new Date().toLocaleDateString('en-CA')"
+               :max="moment().format('YYYY-MM-DD')"
                style="font-weight: bold"
 
         />
@@ -175,6 +175,7 @@ import moment from "moment";
 export default {
   name: "Dividends",
   data: () => ({
+    moment: moment,
     idForDelete: null,
     loading: true,
     qParams: {
