@@ -88,11 +88,11 @@
             <td>{{ report.account.name }}</td>
             <td>{{ report.currency.name }}</td>
             <td>{{ localeDate(report.report_date) }}</td>
-            <td>{{ report.amount }}</td>
-                        <td>
-                          <router-link :to="{ name: 'edit_report', params: { id: report.id }, query: qParams}"><i
-                              class="text-black bi-pencil fs-4"></i></router-link>
-                        </td>
+            <td>{{  parseFloat(report.amount).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1 ").replace('.', ',') }}</td>
+            <td>
+              <router-link :to="{ name: 'edit_report', params: { id: report.id }, query: qParams}"><i
+                  class="text-black bi-pencil fs-4"></i></router-link>
+            </td>
             <td>
               <router-link to="" @click="idForDelete = report.id" data-bs-toggle="modal" data-bs-target="#deleteModal">
                 <i class="bi-x-lg fs-4 text-danger"></i>
@@ -152,7 +152,7 @@ import moment from "moment";
 export default {
   name: "Dividends",
   data: () => ({
-    moment:moment,
+    moment: moment,
     idForDelete: null,
     loading: true,
     reports: [],
