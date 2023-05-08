@@ -69,7 +69,7 @@
         <!--    счетчик записей-->
         <span class="h5 ms-3 my-3">Записей: <span class="badge bg-secondary">{{ dividends.count }}</span></span>
         <!--    общая сумма дивидендов-->
-        <span class="h5 ms-5 my-3">Сумма: <span class="badge bg-secondary">{{ totalPayoff }}</span></span>
+        <span class="h5 ms-5 my-3">Сумма: <span class="badge bg-secondary">{{ parseFloat(totalPayoff).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1 ").replace('.', ',') }}</span></span>
 
         <!--    таблица-->
         <div class="row mt-3">
@@ -87,7 +87,7 @@
               <tbody>
               <tr v-for="(div, index) in dividends.results" :key="div.id">
                 <th>{{ (index + 1) + (qParams.page - 1) * qParams.page_size }}</th>
-                <td>{{ div.date_of_receipt }}</td>
+                <td>{{ localeDate(div.date_of_receipt) }}</td>
                 <td>{{ div.payoff }}</td>
                 <td>{{ div.currency.name }}</td>
                 <td>{{ div.account.name }}</td>
@@ -231,6 +231,11 @@ export default {
         datasets: [{data: res[0], label: 'выплата'}]
       }
       this.loadingChart = false
+    },
+    localeDate(date) {
+      return new Date(date).toLocaleDateString("ru-RU", {
+        year: 'numeric', month: 'long', day: 'numeric'
+      })
     },
   },
   components: {
